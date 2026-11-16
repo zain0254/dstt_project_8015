@@ -22,6 +22,7 @@ ap.add_argument("--model", choices=["lstm", "standin"], default="lstm",
                 help="'standin' = PCA, for pipeline smoke tests only")
 ap.add_argument("--out", default=str(SCORES_DIR))
 ap.add_argument("--limit", type=int, default=0, help="run only the first N jobs (smoke test)")
+ap.add_argument("--device", default=None, help="cuda / cpu (default: cuda if available)")
 args = ap.parse_args()
 
 cfg = load_config()
@@ -36,13 +37,19 @@ if args.model == "lstm":
     from atd.model import train_and_score as fit
 else:
     from atd.model import standin_score as fit
-
+if args.model == "lstm":
+    import torch
+    print("PyTorch", torch.__version__, "| CUDA available:", torch.cuda.is_available(),
+          "|", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU", flush=True)
 print(f"shard {args.shard}/{args.of}: {len(jobs)} jobs", flush=True)
 t_all = time.time()
 for i, j in enumerate(jobs, 1):
     p = score_path(j["file"], j["W"], j["seed"], out)
     if p.exists():
-        continue
+        old = json.loads(str(np.load(p)["meta"]))
+        if old.get("model") == args.model:
+            continue          # finished earlier -> resume
+        p.unlink()            # never mix stand-in and LSTM scores
     s = load_series(j["file"], cfg["nab_dir"], labels)
     x = scaled_series(s)
     W = j["W"]
@@ -51,7 +58,7 @@ for i, j in enumerate(jobs, 1):
     err_w, meta = fit(trw, allw, seed=j["seed"], hidden=m["hidden_size"], latent=m["latent_size"],
                       lr=m["learning_rate"], batch_size=m["batch_size"], max_epochs=m["max_epochs"],
                       patience=m["early_stopping_patience"], holdout=m["early_stopping_holdout"],
-                      threads=m["torch_threads"])
+                      threads=m["torch_threads"], **({"device": args.device} if args.model == "lstm" else {}))
     errors = np.full(s.n, np.nan, dtype=np.float32)
     errors[W - 1:] = err_w
     meta.update({"file": j["file"], "W": W, "seed": j["seed"], "model": args.model,

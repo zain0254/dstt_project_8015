@@ -114,7 +114,7 @@ const METRICS = {composite_f1:'Composite F1 ↑', f1:'Point F1 ↑', precision:'
   hv_fpr:'High-variance FPR ↓', calm_fpr:'Calm-period FPR ↓', nab_standard:'NAB standard ↑', nab_reward_low_fp:'NAB reward-low-FP ↑',
   nab_reward_low_fn:'NAB reward-low-FN ↑', nab_standard_pointwise:'NAB standard, every-step alarms ↑', n_alerts:'Alerts per segment ↓',
   detection_delay_rel:'Detection delay (fraction of window) ↓', alarm_rate:'Alarm rate ↓', roc_auc:'ROC-AUC (model) ↑', pr_auc:'PR-AUC (model) ↑'};
-const CORPUS = {corpus_nab_standard:'Corpus NAB standard ↑', corpus_nab_reward_low_fp:'Corpus NAB reward-low-FP ↑', corpus_nab_reward_low_fn:'Corpus NAB reward-low-FN ↑', corpus_nab_standard_pointwise:'Corpus NAB, every-step alarms ↑'};
+const CORPUS = {clean_fpr:'FPR on anomaly-free test streams ↓', clean_alerts_per_1000:'False alerts per 1,000 points, anomaly-free streams ↓', corpus_nab_standard:'Corpus NAB standard ↑', corpus_nab_reward_low_fp:'Corpus NAB reward-low-FP ↑', corpus_nab_reward_low_fn:'Corpus NAB reward-low-FN ↑', corpus_nab_standard_pointwise:'Corpus NAB, every-step alarms ↑'};
 
 document.getElementById('title').textContent = D.title;
 document.getElementById('subtitle').textContent = `${D.n_eval} NAB evaluation files · ${D.n_tune} tuning files · LSTM-AE window W* = ${D.W} · 3 seeds · thresholds tuned on validation, scored on test`;
@@ -142,8 +142,8 @@ const mlabel = (m) => `<span class="swatch" style="background:${C[m]}"></span>${
 function vclass(v){ return v.startsWith('Supported (stat')||v.startsWith('Supported (impro') ? 'v-good' : v.startsWith('Not') ? 'v-bad' : 'v-warn'; }
 function drawOverview(){
   const box = document.getElementById('hypcards');
-  const text = {H1:'Higher average F1 than at least one fixed baseline', H2:'Fewer false positives during changing normal variability', H3:'Maintain or improve the NAB score'};
-  box.innerHTML = D.hypotheses.map(h => { const det = (h.detail||[]).map(d => `${S[d.b]}: P1 ${F(d.mean_a)} vs ${F(d.mean_b)} (Δ ${F(d.mean_diff)}, Holm p = ${d.p_holm==null?'–':d.p_holm.toFixed(3)}, P1 better on ${h.metric==='hv_fpr'?d.losses:d.wins}/${d.n_files} files)`).join('<br>');
+  const text = {H1:'Higher average F1 than at least one fixed baseline', H2:'Fewer false positives during changing normal variability (secondary: on anomaly-free test streams)', H3:'Maintain or improve the NAB score'};
+  box.innerHTML = D.hypotheses.map(h => { const det = (h.detail||[]).map(d => `${S[d.b]}: P1 ${F(d.mean_a)} vs ${F(d.mean_b)} (Δ ${F(d.mean_diff)}, Holm p = ${d.p_holm==null?'–':d.p_holm.toFixed(3)}, P1 better on ${['hv_fpr','fpr'].includes(h.metric)?d.losses:d.wins}/${d.n_files} files)`).join('<br>');
     return `<div class="card"><h3>${h.hypothesis} · ${h.role}</h3><p>${text[h.hypothesis]}</p><p><span class="verdict ${vclass(h.verdict)}">${h.verdict}</span></p><p class="note">Metric: ${h.metric}<br>${det}</p></div>`; }).join('');
   const sel = document.getElementById('headMetric'); fillSelect(sel, Object.assign({}, METRICS, CORPUS), 'composite_f1');
   const draw = () => { const m = sel.value; const ms = document.getElementById('headAbl').checked ? PRI.concat(ABL) : PRI;
@@ -154,7 +154,7 @@ function drawOverview(){
   sel.onchange = draw; document.getElementById('headAbl').onchange = draw; draw();
   const cols = [['method','Method',(v)=>mlabel(v)],['composite_f1','Comp. F1 ↑'],['f1','Point F1 ↑'],['precision','Prec. ↑'],['recall','Recall ↑'],
     ['event_recall','Event rec. ↑'],['fpr','FPR ↓'],['hv_fpr','HV-FPR ↓'],['n_alerts','Alerts ↓'],['corpus_nab_standard','NAB std ↑'],
-    ['corpus_nab_reward_low_fp','NAB low-FP ↑'],['corpus_nab_reward_low_fn','NAB low-FN ↑'],['detection_delay_rel','Delay ↓'],['roc_auc','ROC-AUC'],['pr_auc','PR-AUC']];
+    ['corpus_nab_reward_low_fp','NAB low-FP ↑'],['corpus_nab_reward_low_fn','NAB low-FN ↑'],['clean_fpr','Clean-stream FPR ↓'],['clean_alerts_per_1000','Clean alerts/1k ↓'],['detection_delay_rel','Delay ↓'],['roc_auc','ROC-AUC'],['pr_auc','PR-AUC']];
   table(document.getElementById('summTable'), PRI.concat(ABL).map(k=>D.summary.find(r=>r.method===k)), cols, {hl: x => x.method === P});
 }
 

@@ -26,6 +26,7 @@ DOMAINS = {
     "realKnownCause": "Known Cause",
     "realTraffic": "Traffic",
     "realTweets": "Twitter",
+    "artificialWithAnomaly": "Artificial",
 }
 
 
@@ -119,7 +120,7 @@ def select_datasets(labels: dict, nab_dir="data/nab", split=(0.6, 0.2, 0.2)) -> 
     """Label-location rule from PROTOCOL.md (uses no model output)."""
     ev, tune = [], []
     for f in sorted(labels):
-        if not f.startswith("real"):
+        if not (f.startswith("real") or f.startswith("artificialWithAnomaly")):
             continue
         if not (Path(ROOT / nab_dir) / f).exists():
             continue

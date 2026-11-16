@@ -31,7 +31,7 @@ P1 chooses between plain and gated memory on validation data.
 ![split](figures/eda/split_overview.png)
 
 - **18 evaluation files** (5 NAB domains): every real NAB file with a labelled anomaly in its test part.
-- **25 tuning files**: every real file with an anomaly in its validation part.
+- **30 tuning files** (25 real + 5 artificial): every file with an anomaly in its validation part. The 23 tuning-only files also provide anomaly-free test streams, which give a direct false-alarm check.
 - Earlier versions used 46 files, and 28 of them had no anomaly in the test part. Those files can't measure detection.
 - Per-file EDA figures are in [`figures/eda/series/`](figures/eda/series/). The summary table is [`results/eda_summary.csv`](results/eda_summary.csv).
 
@@ -78,11 +78,10 @@ All parameters are chosen on **validation data only** (mean composite F1 over th
 ## Reproduce
 
 ```bash
-pip install -r requirements.txt
-python scripts/select_datasets.py
-python scripts/train_score.py --shard 0 --of 1     # 324 LSTM-AE fits (or run 4 shards on AWS)
-python scripts/evaluate.py
-python scripts/make_eda.py && python scripts/make_figures.py && python scripts/make_dashboard.py
+pip install -r requirements.txt        # plus PyTorch (CUDA build for a GPU), see docs/RUN_ON_LAPTOP.md
+python run_pipeline.py                 # download -> select -> EDA -> train (369 LSTM-AE fits) -> evaluate -> figures -> dashboard
 ```
+
+Every figure in `figures/` and the dashboard are written by these scripts from the experiment outputs. Nothing is drawn by hand. Training runs on a GPU laptop (`docs/RUN_ON_LAPTOP.md`) or on AWS EC2 (`docs/AWS_RUNBOOK.md`).
 
 Data: Numenta Anomaly Benchmark v1.1 (Lavin & Ahmad, 2015), included under `data/nab/` with its labels.

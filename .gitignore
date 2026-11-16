@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 *.tmp.npz
 .venv/
+data/_nab_git/

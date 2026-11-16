@@ -84,7 +84,7 @@ def comparison_table(pf, proposed, others, metrics):
     return pd.DataFrame(rows)
 
 
-def decide_hypotheses(pf, corpus, cfg) -> list[dict]:
+def decide_hypotheses(pf, corpus, cfg, clean=None) -> list[dict]:
     """Decision rules fixed in PROTOCOL.md before the run."""
     P = cfg["proposed_method"]
     B = cfg["fixed_baselines"]
@@ -114,6 +114,16 @@ def decide_hypotheses(pf, corpus, cfg) -> list[dict]:
                "Partially supported" if any(r["losses"] > 0 for r in fam) else "Not supported")
     out.append({"hypothesis": "H2", "role": "primary", "metric": "hv_fpr", "verdict": verdict,
                 "detail": [{**r, "p_holm": h} for r, h in zip(fam, adj)]})
+    if clean is not None and len(clean):
+        fam = [paired(clean, "fpr", P, b) for b in B]
+        adj = holm([r["p_value"] for r in fam])
+        lower = all(r["mean_diff"] < 0 for r in fam)
+        sig = all(r["mean_diff"] < 0 and h < alpha for r, h in zip(fam, adj))
+        verdict = ("Supported (statistically significant)" if lower and sig else
+                   "Supported descriptively (not significant)" if lower else
+                   "Partially supported" if any(r["mean_diff"] < 0 for r in fam) else "Not supported")
+        out.append({"hypothesis": "H2", "role": "secondary (anomaly-free test streams)", "metric": "fpr",
+                    "verdict": verdict, "detail": [{**r, "p_holm": h} for r, h in zip(fam, adj)]})
 
     # H3: maintain or improve NAB score (corpus, standard profile) vs fixed baselines
     c = corpus.set_index("method")["corpus_nab_standard"]

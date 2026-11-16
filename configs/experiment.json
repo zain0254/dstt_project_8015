@@ -31,7 +31,7 @@
     "early_stopping_patience": 3,
     "early_stopping_holdout": 0.1,
     "max_train_windows": 2500,
-    "torch_threads": 2
+    "torch_threads": 4
   },
   "score": "mean squared reconstruction error of the window ending at time t (assigned to t)",
   "thresholds": {

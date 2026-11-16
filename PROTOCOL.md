@@ -14,12 +14,12 @@ This file records every design decision **before** the LSTM Autoencoder was trai
 
 ## 2. Data
 
-- NAB v1.1 (numenta/NAB, `data/` and `labels/combined_windows.json`), real-world files only.
+- NAB v1.1 (numenta/NAB, commit `ea702d7`, downloaded by `scripts/download_nab.py` with SHA-256 checksums in `data/nab/MANIFEST.csv`): the 47 labelled real-world files and the 6 artificial files with anomalies.
 - Each file is sorted by timestamp, duplicate timestamps removed, missing values forward-filled.
 - Chronological split per file: train = first 60 %, validation = next 20 %, test = last 20 %.
 - **Selection rule (uses label positions only, never model output):**
-  - *Evaluation set*: every real file with ≥ 1 labelled anomaly window overlapping the test partition → **18 files, 5 domains**.
-  - *Tuning set*: every real file with ≥ 1 window overlapping the validation partition → **25 files**.
+  - *Evaluation set*: every file with ≥ 1 labelled anomaly window overlapping the test partition → **18 files, 5 domains**.
+  - *Tuning set*: every file with ≥ 1 window overlapping the validation partition → **30 files** (25 real + 5 artificial).
   - Files in neither set have no labelled anomaly in validation or test and cannot measure detection; they are excluded. The resulting list is in `configs/datasets.json`.
 - Min–max scaling fitted on the training partition only.
 
@@ -27,7 +27,7 @@ This file records every design decision **before** the LSTM Autoencoder was trai
 
 - Univariate LSTM Autoencoder: encoder LSTM(64) → linear latent(32, tanh) → repeated → decoder LSTM(64) → linear output.
 - Trained **without labels** on windows that end inside the training partition (proposal §5: labels are not used to train). At most 2,500 evenly-spaced training windows per fit; the chronologically last 10 % of them is the early-stopping hold-out (Adam, lr 1e-3, batch 256, ≤ 25 epochs, patience 3).
-- Window sizes W ∈ {30, 50, 100}; seeds {15, 42, 123} → 36 files × 3 × 3 = **324 model fits**.
+- Window sizes W ∈ {30, 50, 100}; seeds {15, 42, 123} → 41 files × 3 × 3 = **369 model fits**.
 - Anomaly score at time t = mean squared reconstruction error of the window ending at t (causal).
 
 ## 4. Threshold methods (the only experimental variable)
@@ -65,5 +65,6 @@ Unit of analysis = file (metrics averaged over the 3 seeds at W\*). Paired two-s
 
 - **H1** (primary metric composite F1; point F1 reported as secondary): *supported* if mean P1 > mean of at least one of B1/B2; *statistically supported* if that difference is also Holm-significant.
 - **H2** (high-variance FPR): *supported* if P1's mean is lower than both B1 and B2 and P1 is lower on at least half of the evaluable files; *statistically supported* if both differences are Holm-significant; *partially supported* if P1 is lower on some files only.
+- **H2, secondary evidence**: false-positive rate on the anomaly-free test partitions of the tuning-only files (no anomaly window in their test part, so every alarm is false). Same decision wording, reported separately.
 - **H3** (corpus NAB, standard profile): *improves* if P1 ≥ both B1 and B2; *maintains* if within 5 points of both; otherwise not supported.
 - **RQ4**: domain-level means and P1-minus-baseline differences (descriptive; 1–5 files per domain is too few for per-domain tests).

@@ -17,6 +17,19 @@ def _set_seed(seed: int):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+
+def get_device(pref: str = "auto"):
+    import torch
+    if pref not in (None, "", "auto"):
+        return torch.device(pref)
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
 
 
 def build_lstm_ae(hidden: int, latent: int):
@@ -45,16 +58,18 @@ def build_lstm_ae(hidden: int, latent: int):
 
 def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed: int,
                     hidden=64, latent=32, lr=1e-3, batch_size=128, max_epochs=30,
-                    patience=4, holdout=0.1, threads=2) -> tuple[np.ndarray, dict]:
-    """Train on train_windows, return per-window MSE for all_windows."""
+                    patience=4, holdout=0.1, threads=2, device="auto") -> tuple[np.ndarray, dict]:
+    """Train on train_windows (GPU if available), return per-window MSE for all_windows."""
     import torch
-    torch.set_num_threads(threads)
+    dev = get_device(device)
+    if dev.type == "cpu":
+        torch.set_num_threads(threads)
     _set_seed(seed)
 
     n_hold = max(1, int(round(holdout * len(train_windows))))
-    tr = torch.from_numpy(train_windows[:-n_hold]).unsqueeze(-1)
-    ho = torch.from_numpy(train_windows[-n_hold:]).unsqueeze(-1)  # chronologically last part
-    model = build_lstm_ae(hidden, latent)
+    tr = torch.from_numpy(np.ascontiguousarray(train_windows[:-n_hold])).unsqueeze(-1).to(dev)
+    ho = torch.from_numpy(np.ascontiguousarray(train_windows[-n_hold:])).unsqueeze(-1).to(dev)  # chronologically last part
+    model = build_lstm_ae(hidden, latent).to(dev)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = torch.nn.MSELoss()
     g = torch.Generator().manual_seed(seed)
@@ -63,7 +78,7 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
     t0 = time.time()
     for epoch in range(max_epochs):
         model.train()
-        perm = torch.randperm(len(tr), generator=g)
+        perm = torch.randperm(len(tr), generator=g).to(dev)
         tot = 0.0
         for i in range(0, len(tr), batch_size):
             xb = tr[perm[i:i + batch_size]]
@@ -78,7 +93,7 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
         history.append((tot / len(tr), hl))
         if hl < best - 1e-7:
             best, bad = hl, 0
-            best_state = {k: v.clone() for k, v in model.state_dict().items()}
+            best_state = {k: v.detach().clone() for k, v in model.state_dict().items()}
         else:
             bad += 1
             if bad >= patience:
@@ -88,9 +103,11 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
     errs = []
     with torch.no_grad():
         for i in range(0, len(all_windows), 2048):
-            xb = torch.from_numpy(all_windows[i:i + 2048]).unsqueeze(-1)
-            errs.append(((model(xb) - xb) ** 2).mean(dim=(1, 2)).numpy())
-    meta = {"epochs_run": len(history), "best_holdout_mse": float(best),
+            xb = torch.from_numpy(np.ascontiguousarray(all_windows[i:i + 2048])).unsqueeze(-1).to(dev)
+            errs.append(((model(xb) - xb) ** 2).mean(dim=(1, 2)).cpu().numpy())
+    meta = {"epochs_run": len(history), "best_epoch": int(np.argmin([h[1] for h in history])) + 1,
+            "best_holdout_mse": float(best), "device": str(dev),
+            "gpu": torch.cuda.get_device_name(0) if dev.type == "cuda" else None,
             "train_seconds": round(time.time() - t0, 1),
             "loss_history": [[round(a, 7), round(b, 7)] for a, b in history]}
     return np.concatenate(errs).astype(np.float32), meta

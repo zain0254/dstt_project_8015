@@ -26,7 +26,7 @@ viz.setup()
 cfg = load_config()
 labels = load_labels(cfg["labels_file"])
 ds = json.loads((ROOT / "configs/datasets.json").read_text())
-for d in ("method", "results", "results/traces"):
+for d in ("method", "eda", "results", "results/traces"):
     (OUT / d).mkdir(parents=True, exist_ok=True)
 
 
@@ -291,3 +291,198 @@ for f in ds["evaluation_files"]:
     axs[1].set_title("alarms raised by each rule", fontsize=9)
     fig.tight_layout(); save(fig, f"results/traces/{file_id(f)}.png")
 print("figures written to", OUT)
+
+
+# ================================================================ extra figures
+from sklearn.metrics import roc_curve
+
+# 11. training curves / early stopping (from the saved training history of every fit)
+metas = []
+for f in Path(args.scores).glob("*.npz"):
+    m = json.loads(str(np.load(f)["meta"]))
+    metas.append(m)
+mdf = pd.DataFrame(metas)
+if "loss_history" in mdf:
+    fig, axs = plt.subplots(1, 3, figsize=(15, 4.2))
+    ramp = {30: "#a9c8f0", 50: "#2a78d6", 100: "#14498c"}
+    for Wv, d in mdf.groupby("W"):
+        H = [np.array(h)[:, 1] / np.array(h)[0, 1] for h in d.loss_history if h]
+        L = max(len(h) for h in H)
+        M = np.full((len(H), L), np.nan)
+        for i, h in enumerate(H):
+            M[i, :len(h)] = h
+        med = np.nanmedian(M, axis=0)
+        q1, q3 = np.nanpercentile(M, 25, axis=0), np.nanpercentile(M, 75, axis=0)
+        x = np.arange(1, L + 1)
+        axs[0].plot(x, med, color=ramp.get(Wv, "#2a78d6"), lw=2, label=f"W = {Wv} (n={len(H)} fits)")
+        axs[0].fill_between(x, q1, q3, color=ramp.get(Wv, "#2a78d6"), alpha=0.15, lw=0)
+    axs[0].set_yscale("log"); axs[0].set_xlabel("epoch"); axs[0].set_ylabel("hold-out MSE ÷ epoch-1 MSE")
+    axs[0].set_title("LSTM-AE training: hold-out loss (median, IQR)"); axs[0].legend(fontsize=8)
+    axs[1].hist(mdf.epochs_run, bins=np.arange(0.5, mdf.epochs_run.max() + 1.5), color="#2a78d6", edgecolor="white")
+    axs[1].set_xlabel("epochs until early stopping"); axs[1].set_ylabel("fits")
+    axs[1].set_title(f"Early stopping (patience {cfg['model']['early_stopping_patience']}, max {cfg['model']['max_epochs']})")
+    if "train_seconds" in mdf:
+        for Wv, d in mdf.groupby("W"):
+            axs[2].scatter(d.n_train_windows, d.train_seconds, s=14, color=ramp.get(Wv), label=f"W = {Wv}", alpha=0.8)
+        dev = mdf["gpu"].dropna().iloc[0] if "gpu" in mdf and mdf["gpu"].notna().any() else "CPU"
+        axs[2].set_xlabel("training windows"); axs[2].set_ylabel("seconds")
+        axs[2].set_title(f"Training time per fit ({dev})"); axs[2].legend(fontsize=8)
+    fig.tight_layout(); save(fig, "results/training_curves.png")
+
+# 12. reconstruction-error distributions: normal vs anomaly-window points (test, W*, seed 42)
+rows = []
+for f in ds["evaluation_files"]:
+    s = load_series(f, cfg["nab_dir"], labels)
+    err, _ = load_errors(f, W_STAR, 42, args.scores)
+    tr_err = err[W_STAR - 1: s.a]
+    z = (err[s.b:] - np.median(tr_err)) / (np.median(np.abs(tr_err - np.median(tr_err))) + 1e-12)
+    rows.append((s.name, z[s.labels[s.b:] == 0], z[s.labels[s.b:] == 1]))
+fig, ax = plt.subplots(figsize=(13, 5.5))
+for i, (nm, zn, za) in enumerate(rows):
+    for zz, off, c in ((zn, -0.18, "#2a78d6"), (za, 0.18, viz.ANOM)):
+        if len(zz):
+            v = np.clip(zz, -5, np.percentile(zz, 99.5))
+            bp = ax.boxplot(v, positions=[i + off], widths=0.32, patch_artist=True, showfliers=False,
+                            medianprops=dict(color=INK))
+            bp["boxes"][0].set_facecolor(c); bp["boxes"][0].set_alpha(0.6)
+ax.set_xticks(range(len(rows))); ax.set_xticklabels([r[0] for r in rows], rotation=60, ha="right", fontsize=8)
+ax.set_yscale("symlog", linthresh=5); ax.set_ylabel("error, robust z (train median / MAD)")
+ax.legend(handles=[Patch(color="#2a78d6", alpha=0.6, label="normal test points"),
+                   Patch(color=viz.ANOM, alpha=0.6, label="points inside NAB anomaly windows")], loc="upper left")
+ax.set_title(f"How separable are anomalies? Test reconstruction errors (W*={W_STAR}, seed 42)")
+save(fig, "results/error_distributions.png")
+
+# 13. ROC curve of the model + each threshold rule's operating point (small multiples)
+ev = ds["evaluation_files"]
+nc = 6; nr = int(np.ceil(len(ev) / nc))
+fig, axs = plt.subplots(nr, nc, figsize=(16, 2.9 * nr), sharex=True, sharey=True)
+tmW = tm[(tm.W == W_STAR) & (tm.seed == 42)]
+for ax, f in zip(axs.flat, ev):
+    s = load_series(f, cfg["nab_dir"], labels)
+    err, _ = load_errors(f, W_STAR, 42, args.scores)
+    y = s.labels[s.b:]
+    if 0 < y.sum() < len(y):
+        fpr_c, tpr_c, _ = roc_curve(y, err[s.b:])
+        ax.plot(fpr_c, tpr_c, color="#9a9994", lw=1.2)
+    for k in PRIMARY:
+        r = tmW[(tmW.file == f) & (tmW.method == k)]
+        if len(r):
+            ax.scatter(r.fpr, r.recall, s=40, color=COLORS[k], edgecolor="white", lw=1, zorder=3)
+    ax.plot([0, 1], [0, 1], ls=":", color=viz.GRID, lw=1)
+    ax.set_title(s.name[:26], fontsize=8)
+for ax in axs.flat[len(ev):]:
+    ax.axis("off")
+fig.supxlabel("false-positive rate"); fig.supylabel("point recall")
+fig.legend(handles=[plt.Line2D([], [], color="#9a9994", label="LSTM-AE ROC curve (all thresholds)")] +
+           [plt.Line2D([], [], ls="", marker="o", color=COLORS[k], label=LABELS[k]) for k in PRIMARY],
+           loc="lower center", ncol=5, bbox_to_anchor=(0.5, -0.02), fontsize=8)
+fig.suptitle("Same model, different decisions: each threshold rule picks a point on (or near) the same ROC curve",
+             fontweight="bold")
+fig.tight_layout(rect=(0, 0.03, 1, 1)); save(fig, "results/roc_operating_points.png")
+
+# 14. alarm outcome breakdown (pooled over files, W*, seeds averaged)
+g = pf[pf.method.isin(PRIMARY + ABLATION)].groupby("method")[["tp", "fp", "fn"]].sum()
+g = g.loc[PRIMARY + ABLATION]
+fig, ax = plt.subplots(figsize=(12, 4.2))
+left = np.zeros(len(g))
+for col, c, lab in (("tp", "#1baf7a", "true alarms (TP)"), ("fp", "#eb6834", "false alarms (FP)"),
+                    ("fn", "#9a9994", "missed anomaly points (FN)")):
+    share = g[col] / g.sum(axis=1)
+    ax.barh(range(len(g)), share, left=left, color=c, label=lab, height=0.62, edgecolor="white", lw=2)
+    for i, (l, v) in enumerate(zip(left, share)):
+        if v > 0.06:
+            ax.text(l + v / 2, i, f"{v:.0%}", ha="center", va="center", color="white", fontsize=8.5, fontweight="bold")
+    left += share
+ax.set_yticks(range(len(g))); ax.set_yticklabels([LABELS[k] for k in g.index], fontsize=8.5); ax.invert_yaxis()
+ax.set_xlim(0, 1); ax.set_xlabel("share of (TP + FP + FN) points, pooled over evaluation files")
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3, fontsize=8.5)
+ax.set_title("Where do the alarms go?", pad=26)
+save(fig, "results/alarm_outcomes.png")
+
+# 15. dataset composition (donut) + anomaly share
+eda = pd.read_csv(ROOT / "results/eda_summary.csv")
+eva = eda[eda.evaluation]
+fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+dom_n = eva.groupby("domain")["n"].sum().sort_values(ascending=False)
+pal = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
+w, _ = axs[0].pie(dom_n, colors=pal[:len(dom_n)], startangle=90, counterclock=False,
+                  wedgeprops=dict(width=0.38, edgecolor="white", linewidth=2))
+axs[0].legend(w, [f"{d}: {v:,} pts ({v / dom_n.sum():.0%}), {int((eva.domain == d).sum())} files"
+                  for d, v in dom_n.items()], loc="upper center", bbox_to_anchor=(0.5, 0.02), fontsize=8.5, ncol=1)
+axs[0].text(0, 0, f"{dom_n.sum():,}\npoints", ha="center", va="center", fontsize=11, fontweight="bold")
+axs[0].set_title("Evaluation data by domain")
+e2 = eva.sort_values("anomaly_point_share")
+axs[1].barh(e2["name"], e2.anomaly_point_share * 100, color=viz.ANOM, height=0.6)
+axs[1].set_xlabel("% of points inside NAB anomaly windows"); axs[1].tick_params(axis="y", labelsize=7)
+axs[1].set_title("Class imbalance per file")
+fig.tight_layout(); save(fig, "eda/dataset_composition.png")
+
+# 16. radar chart of normalised metrics
+cats = [("composite_f1", "Composite F1", False), ("event_recall", "Event recall", False),
+        ("precision", "Point precision", False), ("fpr", "1 − FPR", True), ("hv_fpr", "1 − HV-FPR", True),
+        ("corpus_nab_standard", "NAB / 100", None)]
+ang = np.linspace(0, 2 * np.pi, len(cats), endpoint=False).tolist(); ang += ang[:1]
+fig = plt.figure(figsize=(7.5, 7)); ax = fig.add_subplot(polar=True)
+for k in PRIMARY:
+    v = []
+    for col, _, inv in cats:
+        x = summ.loc[k, col]
+        v.append(x / 100 if inv is None else (1 - x if inv else x))
+    v += v[:1]
+    ax.plot(ang, v, color=COLORS[k], lw=2.2 if k == P else 1.6, label=LABELS[k])
+    ax.fill(ang, v, color=COLORS[k], alpha=0.06)
+ax.set_xticks(ang[:-1]); ax.set_xticklabels([c[1] for c in cats], fontsize=9); ax.set_ylim(0, 1)
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.22), fontsize=8, ncol=2)
+ax.set_title("Overall profile (outer = better)", pad=18)
+save(fig, "results/radar_profile.png")
+
+# 17. average rank across files (lower = better)
+fig, axs = plt.subplots(1, 3, figsize=(15, 3.6))
+for ax, (m, t, asc) in zip(axs, (("composite_f1", "Composite F1", False), ("nab_standard", "NAB standard", False),
+                                 ("hv_fpr", "High-variance FPR", True))):
+    tab = pf[pf.method.isin(PRIMARY)].pivot_table(index="file", columns="method", values=m)
+    rk = tab.rank(axis=1, ascending=asc).mean().sort_values()
+    ax.scatter(rk.values, np.zeros(len(rk)), s=160, c=[COLORS[k] for k in rk.index], zorder=3, edgecolor="white", lw=1.5)
+    for i, (k, v) in enumerate(rk.items()):
+        ax.annotate(f"{SHORT[k]}  {v:.2f}", (v, 0), xytext=(0, 14 if i % 2 == 0 else -20), textcoords="offset points",
+                    ha="center", fontsize=9)
+    ax.set_xlim(0.8, 4.2); ax.set_yticks([]); ax.set_xlabel("average rank across files (1 = best)")
+    ax.set_title(t); ax.grid(axis="y", visible=False)
+fig.suptitle("Average rank of the four main rules over the 18 evaluation files", fontweight="bold")
+fig.tight_layout(); save(fig, "results/average_rank.png")
+
+# 18. false alarms on anomaly-free test streams (H2 secondary)
+if "clean_alerts_per_1000" in summ:
+    cp = pd.read_csv(R / "clean_stream_per_file.csv")
+    fig, axs = plt.subplots(1, 2, figsize=(13, 4.2))
+    order = PRIMARY + ABLATION
+    for ax, (m, t) in zip(axs, (("fpr", "False-positive rate on anomaly-free test streams ↓"),
+                                ("alerts_per_1000", "False alerts per 1,000 points ↓"))):
+        data = [cp[cp.method == k][m].dropna() for k in order]
+        bp = ax.boxplot(data, patch_artist=True, widths=0.55, showfliers=False, medianprops=dict(color=INK))
+        for b, k in zip(bp["boxes"], order):
+            b.set_facecolor(COLORS[k]); b.set_alpha(0.75)
+        for i, d in enumerate(data, 1):
+            ax.scatter(np.random.default_rng(i).normal(i, 0.06, len(d)), d, s=8, color=INK, alpha=0.4, zorder=3)
+        ax.set_xticks(range(1, len(order) + 1)); ax.set_xticklabels([SHORT[k] for k in order]); ax.set_title(t)
+    fig.suptitle(f"H2 secondary evidence: {cp.file.nunique()} test partitions with no labelled anomaly "
+                 "(every alarm is false)", fontweight="bold")
+    fig.tight_layout(); save(fig, "results/clean_stream_false_alarms.png")
+
+# 19. hypothesis summary card (for the paper / slides)
+fig, ax = plt.subplots(figsize=(13, 0.9 + 0.75 * len(hyp["hypotheses"]))); ax.axis("off")
+colmap = lambda v: ("#e7f5ec", "#0f7a3d") if v.startswith("Supported (") and "descript" not in v else \
+    (("#fbe9e9", "#b42323") if v.startswith("Not") else ("#fdf3dc", "#9a6400"))
+for i, h in enumerate(hyp["hypotheses"]):
+    y = len(hyp["hypotheses"]) - i - 0.5
+    bg, fg = colmap(h["verdict"])
+    ax.add_patch(FancyBboxPatch((0.0, y - 0.38), 1.0, 0.76, boxstyle="round,pad=0.0,rounding_size=0.02",
+                                fc=bg, ec="none", transform=ax.transData))
+    det = "; ".join(f"vs {SHORT[d['b']]}: Δ={d['mean_diff']:+.3f}, p_Holm={d['p_holm']:.3f}" for d in h.get("detail", []))
+    ax.text(0.01, y + 0.1, f"{h['hypothesis']} ({h['role']}) — {h['metric']}", fontsize=10, fontweight="bold", color=INK, va="center")
+    ax.text(0.99, y + 0.1, h["verdict"], fontsize=10, fontweight="bold", color=fg, va="center", ha="right")
+    ax.text(0.01, y - 0.18, det, fontsize=8.5, color=INK2, va="center")
+ax.set_xlim(0, 1); ax.set_ylim(0, len(hyp["hypotheses"]))
+ax.set_title(f"Hypothesis decisions (rules fixed in PROTOCOL.md; P1 vs fixed baselines; W* = {W_STAR})", fontweight="bold")
+save(fig, "results/hypothesis_summary.png")
+print("extra figures written")

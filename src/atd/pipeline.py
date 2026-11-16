@@ -128,7 +128,7 @@ def tune(cfg_path="configs/experiment.json", datasets=None, scores_dir=SCORES_DI
 
 # ----------------------------------------------------------------- test
 def _test_one(args):
-    f, W, seed, cfg_path, scores_dir, selected = args
+    f, W, seed, cfg_path, scores_dir, selected, subset = args
     cfg = load_config(cfg_path)
     labels = load_labels(cfg["labels_file"])
     s = load_series(f, cfg["nab_dir"], labels)
@@ -147,7 +147,8 @@ def _test_one(args):
         al, th = apply_method(cfg["thresholds"], m, ctx.train_err, ctx.stream, prm, cache, memo)
         al_t = al[ctx.val_len:]
         met = evaluate(al_t, test_lab, test_win, test_scores, hv[s.b:], cfg["nab_profiles"])
-        rows.append({"file": f, "domain": s.domain, "W": W, "seed": seed, "method": m,
+        met["alerts_per_1000"] = 1000 * met["n_alerts"] / len(al_t)
+        rows.append({"set": subset, "file": f, "domain": s.domain, "W": W, "seed": seed, "method": m,
                      "params": json.dumps(prm, sort_keys=True), **met})
         traces[m] = th[ctx.val_len:].astype(np.float32)
     return rows, (f, W, seed, traces)
@@ -157,15 +158,17 @@ def test(selected_df: pd.DataFrame, cfg_path="configs/experiment.json", datasets
          scores_dir=SCORES_DIR, workers=2, keep_traces_for_W=None):
     cfg = load_config(cfg_path)
     args = []
+    clean = [f for f in datasets["tuning_files"] if f not in datasets["evaluation_files"]]
     for W in cfg["window_sizes"]:
         sel = {r.method: json.loads(r.params) for r in selected_df[selected_df.W == W].itertuples()}
-        for f in datasets["evaluation_files"]:
-            for sd in cfg["seeds"]:
-                args.append((f, W, sd, cfg_path, str(scores_dir), sel))
+        for subset, files in (("evaluation", datasets["evaluation_files"]), ("clean", clean)):
+            for f in files:
+                for sd in cfg["seeds"]:
+                    args.append((f, W, sd, cfg_path, str(scores_dir), sel, subset))
     rows, traces = [], {}
     with ProcessPoolExecutor(workers) as ex:
         for r, (f, W, sd, tr) in ex.map(_test_one, args, chunksize=1):
             rows += r
-            if keep_traces_for_W is not None and W == keep_traces_for_W:
+            if keep_traces_for_W is not None and W == keep_traces_for_W and f in datasets["evaluation_files"]:
                 traces[(f, sd)] = tr
     return pd.DataFrame(rows), traces

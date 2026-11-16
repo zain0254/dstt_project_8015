@@ -20,6 +20,11 @@
   "realTweets/Twitter_volume_KO.csv"
  ],
  "tuning_files": [
+  "artificialWithAnomaly/art_daily_flatmiddle.csv",
+  "artificialWithAnomaly/art_daily_jumpsdown.csv",
+  "artificialWithAnomaly/art_daily_jumpsup.csv",
+  "artificialWithAnomaly/art_daily_nojump.csv",
+  "artificialWithAnomaly/art_load_balancer_spikes.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv",
@@ -47,6 +52,11 @@
   "realTweets/Twitter_volume_PFE.csv"
  ],
  "all_files": [
+  "artificialWithAnomaly/art_daily_flatmiddle.csv",
+  "artificialWithAnomaly/art_daily_jumpsdown.csv",
+  "artificialWithAnomaly/art_daily_jumpsup.csv",
+  "artificialWithAnomaly/art_daily_nojump.csv",
+  "artificialWithAnomaly/art_load_balancer_spikes.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv",
   "realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv",
