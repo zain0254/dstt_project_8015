@@ -1,0 +1,233 @@
+{
+  "_comment": "Locked experiment configuration. See PROTOCOL.md. Do not edit after the training run starts.",
+  "nab_dir": "data/nab",
+  "labels_file": "data/nab/labels/combined_windows.json",
+  "split": {
+    "train": 0.6,
+    "validation": 0.2,
+    "test": 0.2
+  },
+  "dataset_selection": {
+    "rule": "All realXXX NAB files. Evaluation set = files with >=1 labelled anomaly window overlapping the test partition. Tuning set = files with >=1 window overlapping the validation partition.",
+    "file": "configs/datasets.json"
+  },
+  "window_sizes": [
+    30,
+    50,
+    100
+  ],
+  "seeds": [
+    15,
+    42,
+    123
+  ],
+  "model": {
+    "type": "lstm_autoencoder",
+    "hidden_size": 64,
+    "latent_size": 32,
+    "learning_rate": 0.001,
+    "batch_size": 256,
+    "max_epochs": 25,
+    "early_stopping_patience": 3,
+    "early_stopping_holdout": 0.1,
+    "max_train_windows": 2500,
+    "torch_threads": 2
+  },
+  "score": "mean squared reconstruction error of the window ending at time t (assigned to t)",
+  "thresholds": {
+    "B1_fixed_percentile": {
+      "p": [
+        90,
+        95,
+        97,
+        98,
+        99,
+        99.5,
+        99.9
+      ]
+    },
+    "B2_fixed_mean_ksigma": {
+      "k": [
+        1,
+        1.5,
+        2,
+        2.5,
+        3,
+        4,
+        5,
+        6,
+        8
+      ]
+    },
+    "B3_rolling_mean_3sigma": {
+      "k": [
+        3
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": "plain"
+    },
+    "P1_moving_median_mad": {
+      "lam": [
+        1.5,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        12,
+        15,
+        20,
+        25,
+        30,
+        40,
+        50
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": [
+        "plain",
+        "winsorized"
+      ]
+    },
+    "A1_median_mad_plain": {
+      "lam": [
+        1.5,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        12,
+        15,
+        20,
+        25,
+        30,
+        40,
+        50
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": "plain"
+    },
+    "A2_median_mad_winsorized": {
+      "lam": [
+        1.5,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        10,
+        12,
+        15,
+        20,
+        25,
+        30,
+        40,
+        50
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": "winsorized"
+    },
+    "A3_mean_ksigma_plain": {
+      "k": [
+        1,
+        1.5,
+        2,
+        2.5,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": "plain"
+    },
+    "A4_mean_ksigma_winsorized": {
+      "k": [
+        1,
+        1.5,
+        2,
+        2.5,
+        3,
+        4,
+        5,
+        6,
+        8
+      ],
+      "w": [
+        50,
+        100,
+        200,
+        400
+      ],
+      "memory": "winsorized"
+    }
+  },
+  "primary_methods": [
+    "B1_fixed_percentile",
+    "B2_fixed_mean_ksigma",
+    "B3_rolling_mean_3sigma",
+    "P1_moving_median_mad"
+  ],
+  "proposed_method": "P1_moving_median_mad",
+  "fixed_baselines": [
+    "B1_fixed_percentile",
+    "B2_fixed_mean_ksigma"
+  ],
+  "tuning_objective": "composite_f1",
+  "window_selection": "W* = window size with the highest mean validation ROC-AUC of the reconstruction-error score over tuning files (threshold-free, identical for all methods)",
+  "high_variance": {
+    "rolling_window": 50,
+    "percentile_of_train": 75
+  },
+  "nab_profiles": {
+    "standard": {
+      "tp": 1.0,
+      "fp": 0.11,
+      "fn": 1.0
+    },
+    "reward_low_fp": {
+      "tp": 1.0,
+      "fp": 0.22,
+      "fn": 1.0
+    },
+    "reward_low_fn": {
+      "tp": 1.0,
+      "fp": 0.11,
+      "fn": 2.0
+    }
+  },
+  "alpha": 0.05,
+  "nab_alerts": "NAB is scored on alert onsets (first step of each alarm segment), identical for all methods; the every-step variant is reported as *_pointwise.",
+  "p1_definition": "P1 = moving Median + lambda x raw MAD of the previous w reconstruction errors (proposal Step 6). lambda, w and the memory type (plain / winsorized) are hyper-parameters selected on validation partitions only."
+}
