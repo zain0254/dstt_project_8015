@@ -97,7 +97,7 @@
       ],
       "memory": [
         "plain",
-        "winsorized"
+        "gated"
       ]
     },
     "A1_median_mad_plain": {
@@ -126,7 +126,7 @@
       ],
       "memory": "plain"
     },
-    "A2_median_mad_winsorized": {
+    "A2_median_mad_gated": {
       "lam": [
         1.5,
         2,
@@ -150,7 +150,7 @@
         200,
         400
       ],
-      "memory": "winsorized"
+      "memory": "gated"
     },
     "A3_mean_ksigma_plain": {
       "k": [
@@ -172,7 +172,7 @@
       ],
       "memory": "plain"
     },
-    "A4_mean_ksigma_winsorized": {
+    "A4_mean_ksigma_gated": {
       "k": [
         1,
         1.5,
@@ -190,7 +190,7 @@
         200,
         400
       ],
-      "memory": "winsorized"
+      "memory": "gated"
     }
   },
   "primary_methods": [
@@ -229,5 +229,5 @@
   },
   "alpha": 0.05,
   "nab_alerts": "NAB is scored on alert onsets (first step of each alarm segment), identical for all methods; the every-step variant is reported as *_pointwise.",
-  "p1_definition": "P1 = moving Median + lambda x raw MAD of the previous w reconstruction errors (proposal Step 6). lambda, w and the memory type (plain / winsorized) are hyper-parameters selected on validation partitions only."
+  "p1_definition": "P1 = moving Median + lambda x raw MAD of the previous w reconstruction errors (proposal Step 6). lambda, w and the memory type (plain / gated) are hyper-parameters selected on validation partitions only."
 }

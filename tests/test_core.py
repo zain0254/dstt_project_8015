@@ -5,7 +5,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import numpy as np
 from atd.metrics import evaluate, alert_onsets
 from atd.nab_score import nab_raw
-from atd.thresholds import rolling_plain_stats, rolling_winsorized, fixed_percentile, fixed_mean_ksigma
+from atd.thresholds import rolling_plain_stats, rolling_gated, fixed_percentile, fixed_mean_ksigma
 
 
 def test_fixed_thresholds():
@@ -19,17 +19,17 @@ def test_rolling_is_causal():
     stream = np.array([1, 1, 100, 1, 1], float)
     loc, sc = rolling_plain_stats(seed, stream, 5, "median_mad")
     assert loc[2] == 1.0          # spike not in its own history
-    a, th = rolling_winsorized(seed, stream, 5, 3, "median_mad")
+    a, th = rolling_gated(seed, stream, 5, 3, "median_mad")
     assert a[2] == 1 and a[3] == 0
 
 
-def test_winsorized_memory_resists_masking():
+def test_gated_memory_resists_masking():
     rng = np.random.default_rng(0)
     seed = rng.normal(1, 0.1, 200)
     s = rng.normal(1, 0.1, 400); s[100:200] += 5   # long anomaly
     loc, sc = rolling_plain_stats(seed, s, 50, "median_mad")
     plain = (s > loc + 6 * sc)[100:200].sum()
-    wins = rolling_winsorized(seed, s, 50, 6, "median_mad")[0][100:200].sum()
+    wins = rolling_gated(seed, s, 50, 6, "median_mad")[0][100:200].sum()
     assert wins > plain           # plain memory adapts to the anomaly and stops alarming
 
 

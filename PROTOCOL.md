@@ -37,13 +37,13 @@ This file records every design decision **before** the LSTM Autoencoder was trai
 | B1 | Fixed p-th percentile of training errors | p |
 | B2 | Fixed mean + k·std of training errors | k |
 | B3 | Rolling mean + 3·std of previous w errors (2026 base paper, k fixed at 3) | w |
-| **P1** | **Moving median + λ·raw MAD of previous w errors (proposal Step 6)** | λ, w, memory ∈ {plain, winsorized} |
+| **P1** | **Moving median + λ·raw MAD of previous w errors (proposal Step 6)** | λ, w, memory ∈ {plain, gated} |
 | A1 | P1 with plain memory only (ablation) | λ, w |
-| A2 | P1 with winsorized memory only (ablation) | λ, w |
+| A2 | P1 with gated memory only (ablation) | λ, w |
 | A3 | Rolling mean + k·std, plain memory (ablation) | k, w |
-| A4 | Rolling mean + k·std, winsorized memory (ablation) | k, w |
+| A4 | Rolling mean + k·std, gated memory (ablation) | k, w |
 
-*Plain memory*: every error enters the moving window. *Winsorized (anomaly-aware) memory*: an error that exceeded its threshold is stored as the threshold value, so an anomaly cannot inflate the statistics it is judged by, while a lasting shift is still absorbed gradually. Rolling rules are causal and run continuously from the start of validation to the end of test, seeded with the last w training errors. Grids are in `configs/experiment.json`.
+*Plain memory*: every error enters the moving window. *Gated (anomaly-aware) memory*: an error that exceeded its threshold is not added to the moving window, so an anomaly cannot inflate the statistics it is judged by and the window always holds real normal errors. If alarms persist for more than w consecutive steps the change is accepted as the new normal and raw values enter again. Rolling rules are causal and run continuously from the start of validation to the end of test, seeded with the last w training errors. Grids are in `configs/experiment.json`.
 
 ## 5. Tuning and window selection
 

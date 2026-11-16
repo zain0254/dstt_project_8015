@@ -90,9 +90,10 @@ def _tune_one(args):
     cache = PlainCache(ctx.train_err, val_stream)
     rows = []
     mcfg = cfg["thresholds"]
+    memo = {}
     for m in mcfg:
         for prm in param_grid(mcfg, m):
-            al, _ = apply_method(mcfg, m, ctx.train_err, val_stream, prm, cache)
+            al, _ = apply_method(mcfg, m, ctx.train_err, val_stream, prm, cache, memo)
             cf1, nab, rate = _quick_objective(al, val_lab, val_win, cfg["nab_profiles"]["standard"])
             rows.append({"file": f, "W": W, "seed": seed, "method": m,
                          "params": json.dumps(prm, sort_keys=True),
@@ -141,8 +142,9 @@ def _test_one(args):
     test_scores = err[s.b:]
     cache = PlainCache(ctx.train_err, ctx.stream)
     rows, traces = [], {}
+    memo = {}
     for m, prm in selected.items():
-        al, th = apply_method(cfg["thresholds"], m, ctx.train_err, ctx.stream, prm, cache)
+        al, th = apply_method(cfg["thresholds"], m, ctx.train_err, ctx.stream, prm, cache, memo)
         al_t = al[ctx.val_len:]
         met = evaluate(al_t, test_lab, test_win, test_scores, hv[s.b:], cfg["nab_profiles"])
         rows.append({"file": f, "domain": s.domain, "W": W, "seed": seed, "method": m,

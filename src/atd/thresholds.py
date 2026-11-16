@@ -7,12 +7,12 @@ Memory types for rolling rules
 ------------------------------
 plain       Every new error enters the moving window unchanged (textbook
             rolling statistics; used by the 2026 base paper's rolling mu+3sigma).
-winsorized  Anomaly-aware memory. If e_t exceeded its threshold, the value
-            stored in the window is min(e_t, threshold_t). An anomaly
-            therefore cannot inflate the statistics it is judged by (the
-            "masking" failure described in the proposal), while a lasting
-            level shift is still absorbed gradually, because the clipped
-            values sit at the top of the window and pull the median up.
+gated       Anomaly-aware memory. An error that exceeded its threshold is
+            NOT added to the window, so an anomaly cannot inflate the
+            statistics it is judged by (the "masking" failure described in
+            the proposal) and the window always holds real, normal errors.
+            If alarms persist for more than w consecutive steps, the change
+            is accepted as the new normal and raw values enter again.
 """
 from __future__ import annotations
 
@@ -58,8 +58,8 @@ def rolling_plain_stats(seed: np.ndarray, stream: np.ndarray, w: int, kind: str)
     return loc, _floor(loc, scale)
 
 
-def rolling_winsorized(seed: np.ndarray, stream: np.ndarray, w: int, mult: float, kind: str):
-    """Sequential rolling threshold with anomaly-aware (winsorized) memory.
+def rolling_gated(seed: np.ndarray, stream: np.ndarray, w: int, mult: float, kind: str):
+    """Sequential rolling threshold with anomaly-aware (gated) memory.
 
     Returns (alarms, thresholds) aligned with `stream`."""
     buf = np.array(seed[-w:], dtype=float)
@@ -71,6 +71,7 @@ def rolling_winsorized(seed: np.ndarray, stream: np.ndarray, w: int, mult: float
     alarm = np.zeros(n, dtype=np.int8)
     if kind == "mean_std":
         s1, s2 = buf.sum(), (buf ** 2).sum()
+    run = 0  # consecutive alarms
     for t in range(n):
         if kind == "median_mad":
             loc = np.median(buf)
@@ -84,9 +85,12 @@ def rolling_winsorized(seed: np.ndarray, stream: np.ndarray, w: int, mult: float
         thr[t] = th
         if e > th:
             alarm[t] = 1
-            store = th
+            run += 1
+            if run <= w:
+                continue          # flagged: memory unchanged
         else:
-            store = e
+            run = 0
+        store = e                 # normal value, or persistent change accepted as new normal
         if kind == "mean_std":
             old = buf[pos]
             s1 += store - old
@@ -111,7 +115,7 @@ class PlainCache:
 
 
 def apply_method(method_cfg: dict, method: str, train_err: np.ndarray, stream: np.ndarray,
-                 params: dict, cache: PlainCache | None = None):
+                 params: dict, cache: PlainCache | None = None, memo: dict | None = None):
     """Return (alarms, thresholds) over `stream` for one method + params.
 
     `stream` is the error sequence from the start of validation to the end of
@@ -127,12 +131,22 @@ def apply_method(method_cfg: dict, method: str, train_err: np.ndarray, stream: n
     mult = params.get("lam", params.get("k"))
     w = int(params["w"])
     memory = params.get("memory", method_cfg[method].get("memory"))
+    key = (kind, memory, w, float(mult))
+    if memo is not None and key in memo:
+        return memo[key]
+    res = _rolling(kind, memory, w, mult, train_err, stream, cache)
+    if memo is not None:
+        memo[key] = res
+    return res
+
+
+def _rolling(kind, memory, w, mult, train_err, stream, cache):
     if memory == "plain":
         cache = cache or PlainCache(train_err, stream)
         loc, scale = cache.get(w, kind)
         th = loc + mult * scale
         return (stream > th).astype(np.int8), th
-    return rolling_winsorized(train_err, stream, w, mult, kind)
+    return rolling_gated(train_err, stream, w, mult, kind)
 
 
 def param_grid(method_cfg: dict, method: str) -> list[dict]:

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fcfcfb;--card:#ffffff;--ink:#0b0b0b;--ink2:#52514e;--muted:#8a8984;--line:#e6e5e0;--accent:#2a78d6;
+        --good:#0f7a3d;--goodbg:#e7f5ec;--warn:#9a6400;--warnbg:#fdf3dc;--bad:#b42323;--badbg:#fbe9e9}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,sans-serif}
+  header{padding:22px 28px 0;max-width:1400px;margin:auto}
+  h1{font-size:22px;margin:0 0 4px} .sub{color:var(--ink2);margin:0 0 14px}
+  nav{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);max-width:1400px;margin:auto;padding:0 28px}
+  nav button{border:0;background:none;padding:10px 14px;font:inherit;font-weight:500;color:var(--ink2);cursor:pointer;border-bottom:2px solid transparent}
+  nav button.on{color:var(--ink);border-bottom-color:var(--accent)}
+  main{max-width:1400px;margin:auto;padding:20px 28px 60px}
+  .tab{display:none} .tab.on{display:block}
+  .grid{display:grid;gap:16px} .g2{grid-template-columns:repeat(auto-fit,minmax(520px,1fr))} .g3{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .card h3{margin:0 0 6px;font-size:15px} .card p{margin:4px 0;color:var(--ink2)}
+  .verdict{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+  .v-good{background:var(--goodbg);color:var(--good)} .v-warn{background:var(--warnbg);color:var(--warn)} .v-bad{background:var(--badbg);color:var(--bad)}
+  table{border-collapse:collapse;width:100%;font-size:12.5px} th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th{color:var(--ink2);font-weight:600;cursor:pointer;position:sticky;top:0;background:var(--card)} td:first-child,th:first-child{text-align:left}
+  tr.prop td{font-weight:600;background:#f3f7fd}
+  .scroll{overflow:auto;max-height:520px}
+  select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .kpi{font-size:26px;font-weight:700} .kpil{color:var(--ink2);font-size:12px}
+  .swatch{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  code{background:#f2f1ec;padding:1px 5px;border-radius:4px}
+  .plot{width:100%;min-height:360px}
+  .note{font-size:12.5px;color:var(--ink2)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title"></h1>
+  <p class="sub" id="subtitle"></p>
+</header>
+<nav id="nav"></nav>
+<main>
+  <section class="tab" id="overview">
+    <div class="grid g3" id="hypcards"></div>
+    <div class="card" style="margin-top:16px"><h3>Headline metrics (mean over evaluation files)</h3>
+      <div class="row"><label>Metric <select id="headMetric"></select></label><label><input type="checkbox" id="headAbl"> include ablations</label></div>
+      <div id="headPlot" class="plot"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Summary table</h3><p class="note">Click a column to sort. ↑ higher is better, ↓ lower is better.</p><div class="scroll" id="summTable"></div></div>
+  </section>
+
+  <section class="tab" id="explorer">
+    <div class="row"><label>File <select id="fileSel"></select></label><span class="note" id="fileInfo"></span></div>
+    <div class="card"><h3>Raw series, split and NAB anomaly windows</h3><div id="seriesPlot" class="plot"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Test partition: reconstruction error vs each threshold rule</h3>
+      <p class="note">Toggle methods in the legend. Ticks below show where each rule raises alarms. Red bands = labelled anomaly windows.</p>
+      <div id="tracePlot" class="plot" style="min-height:520px"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Metrics for this file (seed-averaged)</h3><div class="scroll" id="fileTable"></div></div>
+  </section>
+
+  <section class="tab" id="compare">
+    <div class="card"><div class="row"><label>Metric <select id="heatMetric"></select></label></div><div id="heatPlot" class="plot" style="min-height:620px"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Per-file paired comparison: proposed P1 vs baseline</h3>
+      <div class="row"><label>Metric <select id="pairMetric"></select></label></div><div id="pairPlot" class="plot"></div></div>
+    <div class="card" style="margin-top:16px"><h3>Statistical tests (P1 vs each method, Wilcoxon signed-rank, Holm-adjusted)</h3><div class="scroll" id="statTable"></div></div>
+  </section>
+
+  <section class="tab" id="domains">
+    <div class="card"><div class="row"><label>Metric <select id="domMetric"></select></label></div><div id="domPlot" class="plot"></div>
+    <p class="note">RQ4. Domains contain 1–5 evaluation files, so these are descriptive comparisons, not significance tests.</p></div>
+  </section>
+
+  <section class="tab" id="ablation">
+    <div class="grid g2">
+      <div class="card"><h3>Ablation: robust statistic × memory</h3><div class="row"><label>Metric <select id="ablMetric"></select></label></div><div id="ablPlot" class="plot"></div></div>
+      <div class="card"><h3>P1 sensitivity to λ (validation data)</h3><div id="sensPlot" class="plot"></div></div>
+      <div class="card"><h3>Effect of LSTM window size W</h3><div class="row"><label>Metric <select id="winMetric"></select></label></div><div id="winPlot" class="plot"></div></div>
+      <div class="card"><h3>Selected parameters (validation only)</h3><div id="selTable"></div><p class="note" id="wselNote"></p></div>
+    </div>
+  </section>
+
+  <section class="tab" id="data">
+    <div class="card"><h3>EDA summary of all selected NAB files</h3><div class="scroll" id="edaTable"></div></div>
+  </section>
+
+  <section class="tab" id="method">
+    <div class="grid g2">
+      <div class="card"><h3>What changes between methods</h3>
+        <p>All methods use the same NAB files, the same chronological 60/20/20 split, the same LSTM Autoencoder and the same reconstruction errors <code>e(t)</code>. Only the rule that converts <code>e(t)</code> into an alarm changes.</p>
+        <p><b>B1</b> threshold = p-th percentile of training errors. <b>B2</b> = mean + k·σ of training errors. <b>B3</b> = mean + 3σ of the previous w errors (2026 base paper).</p>
+        <p><b>P1 (proposed)</b> threshold(t) = median(e<sub>t−w…t−1</sub>) + λ · MAD(e<sub>t−w…t−1</sub>). Its memory can be <i>plain</i> (every error enters the window) or <i>gated</i> (an error that triggered an alarm is not added to the window, so an anomaly cannot raise the bar it is judged by; alarms lasting longer than w steps are accepted as a new normal). λ, w and the memory type are chosen on validation data only.</p></div>
+      <div class="card"><h3>How the metrics work</h3>
+        <p><b>Point F1</b>: every time step in a NAB window is a positive. <b>Event recall</b>: share of windows with at least one alarm. <b>Composite F1</b> = harmonic mean of point precision and event recall (Garg et al., 2021) — counts each event once but still punishes every false alarm.</p>
+        <p><b>NAB score</b>: official Numenta scoring (verified against <code>sweeper.py</code>): early detection inside a window earns up to +1, a missed window costs −1, each false alert costs up to −0.11. Normalised so 0 = never alarming and 100 = perfect. Alarms are counted as alerts at their onset.</p>
+        <p><b>High-variance FPR</b>: false-positive rate on normal test points whose rolling std is above the 75th percentile seen in training — the "changing normal variability" of RQ3/H2.</p>
+        <p><b>ROC-AUC / PR-AUC</b> measure the LSTM-AE score itself and are identical for all threshold rules (RQ1).</p></div>
+    </div>
+  </section>
+</main>
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById('payload').textContent);
+const P = D.proposed, PRI = D.primary, ABL = D.ablation, C = D.colors, L = D.labels, S = D.short;
+const F = n => n == null ? '–' : (Math.abs(n) >= 10 ? n.toFixed(1) : n.toFixed(3));
+const layoutBase = {font:{family:'Inter,system-ui,sans-serif',size:12,color:'#0b0b0b'},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+  margin:{l:60,r:20,t:30,b:50},xaxis:{gridcolor:'#e6e5e0',zeroline:false},yaxis:{gridcolor:'#e6e5e0',zeroline:false},
+  legend:{orientation:'h',y:-0.18},hoverlabel:{bgcolor:'#fff',bordercolor:'#e6e5e0',font:{color:'#0b0b0b'}}};
+const cfgP = {displaylogo:false,responsive:true,modeBarButtonsToRemove:['lasso2d','select2d']};
+const lay = o => Object.assign(JSON.parse(JSON.stringify(layoutBase)), o||{});
+const METRICS = {composite_f1:'Composite F1 ↑', f1:'Point F1 ↑', precision:'Point precision ↑', recall:'Point recall ↑',
+  event_recall:'Event recall ↑', event_precision:'Event precision ↑', event_f1:'Event F1 ↑', fpr:'False-positive rate ↓',
+  hv_fpr:'High-variance FPR ↓', calm_fpr:'Calm-period FPR ↓', nab_standard:'NAB standard ↑', nab_reward_low_fp:'NAB reward-low-FP ↑',
+  nab_reward_low_fn:'NAB reward-low-FN ↑', nab_standard_pointwise:'NAB standard, every-step alarms ↑', n_alerts:'Alerts per segment ↓',
+  detection_delay_rel:'Detection delay (fraction of window) ↓', alarm_rate:'Alarm rate ↓', roc_auc:'ROC-AUC (model) ↑', pr_auc:'PR-AUC (model) ↑'};
+const CORPUS = {corpus_nab_standard:'Corpus NAB standard ↑', corpus_nab_reward_low_fp:'Corpus NAB reward-low-FP ↑', corpus_nab_reward_low_fn:'Corpus NAB reward-low-FN ↑', corpus_nab_standard_pointwise:'Corpus NAB, every-step alarms ↑'};
+
+document.getElementById('title').textContent = D.title;
+document.getElementById('subtitle').textContent = `${D.n_eval} NAB evaluation files · ${D.n_tune} tuning files · LSTM-AE window W* = ${D.W} · 3 seeds · thresholds tuned on validation, scored on test`;
+
+// tabs (hash routing)
+const TABS = [['overview','Overview'],['explorer','File explorer'],['compare','Comparisons'],['domains','Domains (RQ4)'],['ablation','Ablation & sensitivity'],['data','Data (EDA)'],['method','Method & metrics']];
+const nav = document.getElementById('nav'); const drawn = {};
+TABS.forEach(([id,t]) => { const b = document.createElement('button'); b.textContent = t; b.onclick = () => { location.hash = id; }; b.dataset.id = id; nav.appendChild(b); });
+function show(){ const id = (location.hash||'#overview').slice(1); const ok = TABS.some(t=>t[0]===id) ? id : 'overview';
+  document.querySelectorAll('.tab').forEach(s => s.classList.toggle('on', s.id === ok));
+  nav.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.id === ok));
+  if(!drawn[ok]){ drawn[ok]=1; ({overview:drawOverview,explorer:drawExplorer,compare:drawCompare,domains:drawDomains,ablation:drawAblation,data:drawData,method:()=>{}})[ok](); }
+  window.dispatchEvent(new Event('resize')); }
+window.addEventListener('hashchange', show);
+
+function fillSelect(el, opts, val){ el.innerHTML = Object.entries(opts).map(([k,v]) => `<option value="${k}">${v}</option>`).join(''); if(val) el.value = val; }
+function table(el, rows, cols, opts){ opts = opts||{}; let sortK = null, asc = false;
+  const render = () => { let r = rows.slice(); if(sortK) r.sort((a,b)=> ((a[sortK]??-1e18) > (b[sortK]??-1e18) ? 1 : -1) * (asc?1:-1));
+    el.innerHTML = `<table><thead><tr>${cols.map(c=>`<th data-k="${c[0]}">${c[1]}</th>`).join('')}</tr></thead><tbody>${
+      r.map(x=>`<tr class="${opts.hl&&opts.hl(x)?'prop':''}">${cols.map(c=>`<td>${c[2]?c[2](x[c[0]],x):(typeof x[c[0]]==='number'?F(x[c[0]]):(x[c[0]]??'–'))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    el.querySelectorAll('th').forEach(th => th.onclick = () => { asc = sortK === th.dataset.k ? !asc : false; sortK = th.dataset.k; render(); }); };
+  render(); }
+const mlabel = (m) => `<span class="swatch" style="background:${C[m]}"></span>${L[m]}`;
+
+function vclass(v){ return v.startsWith('Supported (stat')||v.startsWith('Supported (impro') ? 'v-good' : v.startsWith('Not') ? 'v-bad' : 'v-warn'; }
+function drawOverview(){
+  const box = document.getElementById('hypcards');
+  const text = {H1:'Higher average F1 than at least one fixed baseline', H2:'Fewer false positives during changing normal variability', H3:'Maintain or improve the NAB score'};
+  box.innerHTML = D.hypotheses.map(h => { const det = (h.detail||[]).map(d => `${S[d.b]}: P1 ${F(d.mean_a)} vs ${F(d.mean_b)} (Δ ${F(d.mean_diff)}, Holm p = ${d.p_holm==null?'–':d.p_holm.toFixed(3)}, P1 better on ${h.metric==='hv_fpr'?d.losses:d.wins}/${d.n_files} files)`).join('<br>');
+    return `<div class="card"><h3>${h.hypothesis} · ${h.role}</h3><p>${text[h.hypothesis]}</p><p><span class="verdict ${vclass(h.verdict)}">${h.verdict}</span></p><p class="note">Metric: ${h.metric}<br>${det}</p></div>`; }).join('');
+  const sel = document.getElementById('headMetric'); fillSelect(sel, Object.assign({}, METRICS, CORPUS), 'composite_f1');
+  const draw = () => { const m = sel.value; const ms = document.getElementById('headAbl').checked ? PRI.concat(ABL) : PRI;
+    const rows = ms.map(k => D.summary.find(r => r.method === k));
+    Plotly.react('headPlot', [{type:'bar', x: ms.map(k=>S[k]), y: rows.map(r=>r[m]), marker:{color: ms.map(k=>C[k])},
+      text: rows.map(r=>F(r[m])), textposition:'outside', hovertemplate: ms.map(k=>L[k]+'<br>%{y:.4f}<extra></extra>')}],
+      lay({yaxis:{title:METRICS[m]||CORPUS[m],gridcolor:'#e6e5e0'}, showlegend:false}), cfgP); };
+  sel.onchange = draw; document.getElementById('headAbl').onchange = draw; draw();
+  const cols = [['method','Method',(v)=>mlabel(v)],['composite_f1','Comp. F1 ↑'],['f1','Point F1 ↑'],['precision','Prec. ↑'],['recall','Recall ↑'],
+    ['event_recall','Event rec. ↑'],['fpr','FPR ↓'],['hv_fpr','HV-FPR ↓'],['n_alerts','Alerts ↓'],['corpus_nab_standard','NAB std ↑'],
+    ['corpus_nab_reward_low_fp','NAB low-FP ↑'],['corpus_nab_reward_low_fn','NAB low-FN ↑'],['detection_delay_rel','Delay ↓'],['roc_auc','ROC-AUC'],['pr_auc','PR-AUC']];
+  table(document.getElementById('summTable'), PRI.concat(ABL).map(k=>D.summary.find(r=>r.method===k)), cols, {hl: x => x.method === P});
+}
+
+function drawExplorer(){
+  const sel = document.getElementById('fileSel'); const fl = Object.keys(D.files);
+  sel.innerHTML = fl.map(f => `<option value="${f}">${D.files[f].name} (${D.files[f].domain})</option>`).join('');
+  const draw = () => { const f = D.files[sel.value];
+    document.getElementById('fileInfo').textContent = `${f.n.toLocaleString()} points · ${f.windows.length} labelled windows`;
+    const shapes = f.windows.map(w => ({type:'rect', xref:'x', yref:'paper', x0:w[0], x1:w[1], y0:0, y1:1, fillcolor:'rgba(227,73,72,0.18)', line:{width:0}}))
+      .concat([{type:'rect',xref:'x',yref:'paper',x0:f.a,x1:f.b,y0:0,y1:1,fillcolor:'rgba(42,120,214,0.06)',line:{width:0}},
+               {type:'rect',xref:'x',yref:'paper',x0:f.b,x1:f.series.t[f.series.t.length-1],y0:0,y1:1,fillcolor:'rgba(235,104,52,0.07)',line:{width:0}}]);
+    Plotly.react('seriesPlot', [{x:f.series.t, y:f.series.v, type:'scattergl', mode:'lines', line:{color:'#0b0b0b',width:1}, name:'value'}],
+      lay({shapes, showlegend:false, annotations:[{x:f.a,y:1.04,yref:'paper',text:'validation →',showarrow:false,xanchor:'left',font:{color:'#52514e'}},{x:f.b,y:1.04,yref:'paper',text:'test →',showarrow:false,xanchor:'left',font:{color:'#52514e'}}]}), cfgP);
+    if(f.trace){ const tr = f.trace; const ms = PRI.concat(ABL).filter(k => tr.thr[k]);
+      const traces = [{x:tr.t, y:tr.err, type:'scattergl', mode:'lines', name:'reconstruction error', line:{color:'#9a9994',width:1}}];
+      ms.forEach(k => traces.push({x:tr.t, y:tr.thr[k], type:'scattergl', mode:'lines', name:S[k]+' threshold', line:{color:C[k], width:k===P?2.4:1.5}, visible: PRI.includes(k)?true:'legendonly'}));
+      ms.forEach((k,j) => { const xs=[], ys=[]; tr.alarms[k].forEach((a,i)=>{ if(a){ xs.push(tr.t[i]); ys.push(j);} });
+        traces.push({x:xs, y:ys, yaxis:'y2', type:'scattergl', mode:'markers', marker:{symbol:'line-ns-open', size:9, color:C[k]}, name:S[k]+' alarms', showlegend:false, visible: PRI.includes(k)?true:'legendonly'}); });
+      const errs = tr.err.slice().sort((a,b)=>a-b); const top = errs[Math.floor(errs.length*0.995)]*1.8;
+      const wsh = f.windows.map(w => ({type:'rect', xref:'x', yref:'paper', x0:w[0], x1:w[1], y0:0, y1:1, fillcolor:'rgba(227,73,72,0.15)', line:{width:0}}));
+      Plotly.react('tracePlot', traces, lay({shapes:wsh, xaxis:{range:[tr.t[0], tr.t[tr.t.length-1]],gridcolor:'#e6e5e0'},
+        yaxis:{domain:[0.32,1], range:[0, top], title:'error / threshold', gridcolor:'#e6e5e0'},
+        yaxis2:{domain:[0,0.26], tickvals:ms.map((_,j)=>j), ticktext:ms.map(k=>S[k]), range:[-0.7, ms.length-0.3], gridcolor:'#e6e5e0'}, legend:{orientation:'h', y:-0.1}}), cfgP);
+    } else { document.getElementById('tracePlot').innerHTML = '<p class="note">No trace available.</p>'; }
+    const rows = D.per_file.filter(r => r.file === sel.value);
+    const cols = [['method','Method',(v)=>mlabel(v)],['composite_f1','Comp. F1'],['f1','Point F1'],['precision','Prec.'],['recall','Recall'],['event_recall','Event rec.'],
+      ['fpr','FPR'],['hv_fpr','HV-FPR'],['n_alerts','Alerts'],['nab_standard','NAB std'],['detection_delay_rel','Delay'],['roc_auc','ROC-AUC']];
+    table(document.getElementById('fileTable'), PRI.concat(ABL).map(k=>rows.find(r=>r.method===k)).filter(Boolean), cols, {hl:x=>x.method===P}); };
+  sel.onchange = draw; draw();
+}
+
+function drawCompare(){
+  const hs = document.getElementById('heatMetric'); fillSelect(hs, METRICS, 'composite_f1');
+  const names = [...new Set(D.per_file.map(r=>r.name))]; const dom = {}; D.per_file.forEach(r=>dom[r.name]=r.domain);
+  names.sort((a,b)=> (dom[a]+a).localeCompare(dom[b]+b)); const ms = PRI.concat(ABL);
+  const draw = () => { const m = hs.value;
+    const z = names.map(n => ms.map(k => { const r = D.per_file.find(x=>x.name===n && x.method===k); return r ? r[m] : null; }));
+    const lower = METRICS[m].includes('↓');
+    Plotly.react('heatPlot', [{type:'heatmap', z, x: ms.map(k=>S[k]), y: names.map(n=>`${n} [${dom[n]}]`), colorscale: lower ? [[0,'#fdf0e9'],[1,'#b8471c']] : [[0,'#eef4fc'],[1,'#14498c']],
+      reversescale:false, text: z.map(r=>r.map(v=>F(v))), texttemplate:'%{text}', hovertemplate:'%{y}<br>%{x}: %{z:.4f}<extra></extra>', zsmooth:false}],
+      lay({margin:{l:310,r:20,t:20,b:40}, yaxis:{autorange:'reversed'}, xaxis:{side:'top'}}), cfgP); };
+  hs.onchange = draw; draw();
+  const ps = document.getElementById('pairMetric'); fillSelect(ps, METRICS, 'composite_f1');
+  const drawP = () => { const m = ps.value; const tr = [];
+    ['B1_fixed_percentile','B2_fixed_mean_ksigma','B3_rolling_mean_3sigma'].forEach(k => { const xs=[], ys=[], tx=[];
+      names.forEach(n => { const a = D.per_file.find(x=>x.name===n&&x.method===P), b = D.per_file.find(x=>x.name===n&&x.method===k);
+        if(a&&b&&a[m]!=null&&b[m]!=null){ xs.push(b[m]); ys.push(a[m]); tx.push(n);} });
+      tr.push({x:xs,y:ys,text:tx,mode:'markers',type:'scatter',name:'P1 vs '+S[k],marker:{size:10,color:C[k],line:{color:'#fff',width:1.5}},hovertemplate:'%{text}<br>baseline %{x:.3f}<br>P1 %{y:.3f}<extra>'+S[k]+'</extra>'}); });
+    const all = tr.flatMap(t=>t.x.concat(t.y)); const lo = Math.min(...all), hi = Math.max(...all);
+    tr.push({x:[lo,hi],y:[lo,hi],mode:'lines',line:{dash:'dash',color:'#8a8984'},showlegend:false,hoverinfo:'skip'});
+    Plotly.react('pairPlot', tr, lay({xaxis:{title:'baseline (per file)',gridcolor:'#e6e5e0'}, yaxis:{title:'P1 proposed (per file)',gridcolor:'#e6e5e0'},
+      annotations:[{x:0.02,y:0.98,xref:'paper',yref:'paper',showarrow:false,xanchor:'left',text: METRICS[m].includes('↓') ? 'below diagonal = P1 better' : 'above diagonal = P1 better',font:{color:'#52514e'}}]}), cfgP); };
+  ps.onchange = drawP; drawP();
+  const cols = [['metric','Metric'],['b','vs',(v)=>mlabel(v)],['n_files','Files'],['mean_a','P1 mean'],['mean_b','Other mean'],['mean_diff','Δ mean'],
+    ['ci95_low','CI low'],['ci95_high','CI high'],['wins','P1 higher'],['losses','P1 lower'],['rank_biserial','Effect r'],['p_value','p'],['p_holm','p (Holm)',(v)=> v==null?'–':`<b style="color:${v<0.05?'#0f7a3d':'#52514e'}">${v.toFixed(4)}</b>`]];
+  table(document.getElementById('statTable'), D.comparisons, cols);
+}
+
+function drawDomains(){
+  const s = document.getElementById('domMetric'); fillSelect(s, METRICS, 'composite_f1');
+  const doms = [...new Set(D.per_file.map(r=>r.domain))].sort();
+  const draw = () => { const m = s.value;
+    const tr = PRI.map(k => ({type:'bar', name:L[k], marker:{color:C[k]}, x: doms.map(d => `${d} (n=${D.per_file.filter(r=>r.domain===d&&r.method===k).length})`),
+      y: doms.map(d => { const v = D.per_file.filter(r=>r.domain===d&&r.method===k&&r[m]!=null).map(r=>r[m]); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; }),
+      hovertemplate:'%{x}<br>%{y:.4f}<extra>'+S[k]+'</extra>'}));
+    Plotly.react('domPlot', tr, lay({barmode:'group', yaxis:{title:METRICS[m],gridcolor:'#e6e5e0'}}), cfgP); };
+  s.onchange = draw; draw();
+}
+
+function drawAblation(){
+  const s = document.getElementById('ablMetric'); fillSelect(s, Object.assign({}, METRICS, CORPUS), 'composite_f1');
+  const ms = ABL.concat([P, 'B3_rolling_mean_3sigma']);
+  const draw = () => { const m = s.value; const rows = ms.map(k=>D.summary.find(r=>r.method===k));
+    Plotly.react('ablPlot', [{type:'bar', orientation:'h', y: ms.map(k=>L[k]), x: rows.map(r=>r[m]), marker:{color:ms.map(k=>C[k])}, text: rows.map(r=>F(r[m])), textposition:'outside', hovertemplate:'%{y}<br>%{x:.4f}<extra></extra>'}],
+      lay({margin:{l:280,r:40,t:20,b:40}, yaxis:{autorange:'reversed'}, showlegend:false}), cfgP); };
+  s.onchange = draw; draw();
+  const T = D.tuning_p1.map(r => Object.assign({}, r, JSON.parse(r.params)));
+  const ws = [...new Set(T.map(r=>r.w))].sort((a,b)=>a-b); const ramp = ['#a9c8f0','#6ea2e6','#2a78d6','#14498c'];
+  const tr = [];
+  ['plain','gated'].forEach(mem => ws.forEach((w,i) => { const d = T.filter(r=>r.memory===mem&&r.w===w).sort((a,b)=>a.lam-b.lam);
+    tr.push({x:d.map(r=>r.lam), y:d.map(r=>r.val_composite_f1), mode:'lines+markers', name:`${mem}, w=${w}`, line:{color:ramp[i], width:2, dash: mem==='plain'?'dot':'solid'}, marker:{size:6}}); }));
+  Plotly.react('sensPlot', tr, lay({xaxis:{type:'log', title:'λ', gridcolor:'#e6e5e0'}, yaxis:{title:'validation composite F1', gridcolor:'#e6e5e0'}}), cfgP);
+  const ws2 = document.getElementById('winMetric'); fillSelect(ws2, {composite_f1:METRICS.composite_f1,f1:METRICS.f1,event_recall:METRICS.event_recall,fpr:METRICS.fpr,hv_fpr:METRICS.hv_fpr,nab_standard:METRICS.nab_standard}, 'composite_f1');
+  const drawW = () => { const m = ws2.value;
+    Plotly.react('winPlot', PRI.map(k => { const d = D.by_window.filter(r=>r.method===k).sort((a,b)=>a.W-b.W);
+      return {x:d.map(r=>'W='+r.W), y:d.map(r=>r[m]), mode:'lines+markers', name:S[k], line:{color:C[k], width:2}, marker:{size:9}}; }),
+      lay({yaxis:{title:METRICS[m],gridcolor:'#e6e5e0'}}), cfgP); };
+  ws2.onchange = drawW; drawW();
+  table(document.getElementById('selTable'), D.selected, [['method','Method',(v)=>mlabel(v)],['params','Selected parameters'],['val_composite_f1','Val. comp. F1'],['val_nab_standard','Val. NAB']]);
+  document.getElementById('wselNote').textContent = 'Window size chosen by mean validation ROC-AUC (threshold-free): ' + D.wsel.map(r=>`W=${r.W}: ${F(r.val_roc_auc)}`).join(' · ') + ` → W* = ${D.W}`;
+}
+
+function drawData(){
+  const cols = [['name','File'],['domain','Domain'],['n','Points',(v)=>v.toLocaleString()],['start','Start',(v)=>String(v).slice(0,10)],['end','End',(v)=>String(v).slice(0,10)],
+    ['median_step_min','Step (min)'],['missing_filled','Missing'],['duplicates_removed','Dup. removed'],['mean','Mean'],['std','Std'],['skew','Skew'],
+    ['windows_total','Windows'],['windows_train','in train'],['windows_val','in val'],['windows_test','in test'],['evaluation','Eval?',(v)=>v?'yes':''],['tuning','Tune?',(v)=>v?'yes':'']];
+  table(document.getElementById('edaTable'), D.eda, cols);
+}
+show();
+</script>
+</body>
+</html>
