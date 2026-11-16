@@ -61,7 +61,7 @@ for f, s in series.items():
     ax2.plot(s.timestamps, rs, color="#6250d6", lw=1, label="rolling std (50)")
     ax2.fill_between(s.timestamps, 0, np.nanmax(rs.to_numpy()) if rs.notna().any() else 1, where=hv,
                      color="#6250d6", alpha=0.12, lw=0, label="high-variance zone (> train P75)")
-    ax2.legend(loc="upper left", fontsize=8)
+    ax2.legend(loc="upper left", fontsize=8, frameon=True, facecolor="white", framealpha=0.85, edgecolor="none")
     ax2.set_ylabel("rolling std")
     ax3 = fig.add_subplot(gs[:, 3])
     ax3.hist(s.values[s.labels == 0], bins=50, color="#2a78d6", alpha=0.8, label="normal points", orientation="horizontal")
