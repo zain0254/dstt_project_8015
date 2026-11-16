@@ -20,6 +20,8 @@ An LSTM Autoencoder turns each NAB time series into a stream of reconstruction e
 
 P1 chooses between plain and gated memory on validation data.
 
+*This is a synthetic illustration of how each rule behaves. It is not evidence that any rule is better. The real comparison is the NAB experiment below, where the proposed method is tested like every other rule and may win or lose on each metric.*
+
 ## Results
 
 <!-- RESULTS_START -->
@@ -82,6 +84,6 @@ pip install -r requirements.txt        # plus PyTorch (CUDA build for a GPU), se
 python run_pipeline.py                 # download -> select -> EDA -> train (369 LSTM-AE fits) -> evaluate -> figures -> dashboard
 ```
 
-Every figure in `figures/` and the dashboard are written by these scripts from the experiment outputs. Nothing is drawn by hand. Training runs on a GPU laptop (`docs/RUN_ON_LAPTOP.md`) or on AWS EC2 (`docs/AWS_RUNBOOK.md`).
+Every figure in `figures/` and the dashboard are written by these scripts from the experiment outputs. Nothing is drawn by hand. Training runs on a GPU laptop under WSL Ubuntu (`docs/RUN_ON_WSL.md`, `setup_wsl.sh`), natively on Windows (`docs/RUN_ON_LAPTOP.md`), or on AWS EC2 (`docs/AWS_RUNBOOK.md`).
 
 Data: Numenta Anomaly Benchmark v1.1 (Lavin & Ahmad, 2015), included under `data/nab/` with its labels.
