@@ -1,0 +1,16 @@
+timing 6 real fits on this machine ...
+  speed_7578 W=30: 6.3 s, 29 epochs
+  ec2_cpu_utilization_fe7f93 W=30: 0.9 s, 9 epochs
+  machine_temperature_system_failure W=30: 1.8 s, 15 epochs
+  art_daily_nojump W=50: 0.4 s, 17 epochs
+  elb_request_count_8c0756 W=100: 3.2 s, 33 epochs
+  Twitter_volume_PFE W=100: 3.3 s, 26 epochs
+
+projected runtime on this machine (GPU):
+  split protocol training :   0.3 h  (369 fits)
+  full-corpus training    :   0.2 h  (174 fits, worst case W=100)
+  threshold evaluation    :   0.1 h  (8 worker processes)
+  figures/dashboard/report:   0.2 h
+  TOTAL                   :   0.8 h   (budget 15 h)
+
+DECISION: within budget -> full NAB evaluation (all 58 files).

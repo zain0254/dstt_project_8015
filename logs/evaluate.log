@@ -1,0 +1,28 @@
+tuning on validation partitions ...
+W* = 30
+                method                                  params  val_composite_f1
+   A1_median_mad_plain                    {"lam": 15, "w": 50}          0.526729
+   A2_median_mad_gated                    {"lam": 15, "w": 50}          0.513196
+  A3_mean_ksigma_plain                      {"k": 3, "w": 400}          0.556511
+  A4_mean_ksigma_gated                      {"k": 6, "w": 100}          0.515472
+   B1_fixed_percentile                               {"p": 98}          0.517811
+  B2_fixed_mean_ksigma                              {"k": 2.5}          0.542780
+B3_rolling_mean_3sigma                      {"k": 3, "w": 400}          0.556511
+  B4_fixed_mean_3sigma                                {"k": 3}          0.534472
+  P1_moving_median_mad {"lam": 15, "memory": "plain", "w": 50}          0.526729
+evaluating on test partitions ...
+H1 primary -> Not supported
+H1 secondary (point F1) -> Not supported
+H2 primary -> Supported descriptively (not significant)
+H2 secondary (anomaly-free test streams) -> Not supported
+H3 primary -> Not supported
+                method  composite_f1    f1  event_recall   fpr  hv_fpr  clean_fpr  n_alerts  corpus_nab_standard  corpus_nab_standard_pointwise
+   A1_median_mad_plain         0.547 0.179         0.793 0.037   0.090      0.101     5.759               54.663                       -128.278
+   A2_median_mad_gated         0.547 0.293         0.821 0.082   0.199      0.231     7.074               46.598                       -429.461
+  A3_mean_ksigma_plain         0.741 0.255         0.910 0.024   0.090      0.036     4.741               66.625                        -72.582
+  A4_mean_ksigma_gated         0.564 0.298         0.765 0.077   0.203      0.227     4.852               50.868                       -325.938
+   B1_fixed_percentile         0.707 0.370         0.972 0.196   0.238      0.067     9.056               63.997                       -455.585
+  B2_fixed_mean_ksigma         0.699 0.393         0.972 0.207   0.272      0.083     9.907               60.709                       -480.481
+B3_rolling_mean_3sigma         0.741 0.255         0.910 0.024   0.090      0.036     4.741               66.625                        -72.582
+  B4_fixed_mean_3sigma         0.743 0.373         0.972 0.194   0.245      0.066     5.611               73.271                       -399.290
+  P1_moving_median_mad         0.547 0.179         0.793 0.037   0.090      0.101     5.759               54.663                       -128.278

@@ -25,7 +25,35 @@ P1 chooses between plain and gated memory on validation data.
 ## Results
 
 <!-- RESULTS_START -->
-*Results appear here automatically after `python run_pipeline.py` (written by `scripts/make_report.py`).*
+**Full-corpus protocol (primary)** — 52 files, 107 anomaly windows, W* = 30
+
+| Method | Composite F1 ↑ | Point F1 ↑ | Precision ↑ | Recall ↑ | Event recall ↑ | FPR ↓ | High-var FPR ↓ | Alerts ↓ | NAB std ↑ | NAB low-FP ↑ | NAB low-FN ↑ | Delay ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| B1 Fixed percentile | 0.473 | 0.226 | 0.398 | 0.231 | 0.717 | 0.078 | 0.172 | 11.6 | 39.0 | 13.1 | 48.9 | 0.397 |
+| B2 Fixed mean + k·σ | 0.468 | 0.222 | 0.398 | 0.217 | 0.692 | 0.069 | 0.134 | 11.0 | 43.5 | 22.3 | 52.1 | 0.429 |
+| B3 Rolling mean + 3σ (base paper) | 0.482 | 0.207 | 0.393 | 0.151 | 0.827 | 0.031 | 0.141 | 17.9 | 36.6 | -4.370 | 51.7 | 0.367 |
+| B4 Global mean + 3σ (base paper, untuned) | 0.458 | 0.237 | 0.366 | 0.246 | 0.783 | 0.087 | 0.200 | 17.3 | 32.7 | -4.814 | 46.6 | 0.383 |
+| **P1 Moving median + λ·MAD (proposed)** | 0.433 | 0.221 | 0.376 | 0.219 | 0.815 | 0.098 | 0.255 | 17.3 | 30.3 | -12.7 | 46.2 | 0.354 |
+
+H1: Not supported · H2: Partially supported · H3: Not supported
+
+![headline](figures/full/headline_metrics.png)
+
+**Split protocol (proposal, 60/20/20)** — 18 files, 25 anomaly windows, W* = 30
+
+| Method | Composite F1 ↑ | Point F1 ↑ | Precision ↑ | Recall ↑ | Event recall ↑ | FPR ↓ | High-var FPR ↓ | Alerts ↓ | NAB std ↑ | NAB low-FP ↑ | NAB low-FN ↑ | Delay ↓ |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| B1 Fixed percentile | 0.707 | 0.370 | 0.613 | 0.370 | 0.972 | 0.196 | 0.238 | 9.056 | 64.0 | 44.4 | 72.0 | 0.366 |
+| B2 Fixed mean + k·σ | 0.699 | 0.393 | 0.597 | 0.397 | 0.972 | 0.207 | 0.272 | 9.907 | 60.7 | 37.3 | 69.8 | 0.328 |
+| B3 Rolling mean + 3σ (base paper) | 0.741 | 0.255 | 0.714 | 0.169 | 0.910 | 0.024 | 0.090 | 4.741 | 66.6 | 55.9 | 72.0 | 0.396 |
+| B4 Global mean + 3σ (base paper, untuned) | 0.743 | 0.373 | 0.657 | 0.373 | 0.972 | 0.194 | 0.245 | 5.611 | 73.3 | 64.1 | 78.2 | 0.380 |
+| **P1 Moving median + λ·MAD (proposed)** | 0.547 | 0.179 | 0.489 | 0.138 | 0.793 | 0.037 | 0.090 | 5.759 | 54.7 | 39.7 | 61.8 | 0.399 |
+
+H1: Not supported · H2: Supported descriptively (not significant) · H3: Not supported
+
+![headline](figures/split/headline_metrics.png)
+
+Full tables, statistics and every figure: [docs/RESULTS.md](docs/RESULTS.md)
 <!-- RESULTS_END -->
 
 ## Data and protocols

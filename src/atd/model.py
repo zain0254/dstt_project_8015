@@ -75,7 +75,7 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
     g = torch.Generator().manual_seed(seed)
 
     best, best_state, bad, history = np.inf, None, 0, []
-    t0 = time.time()
+    t0 = time.perf_counter()
     for epoch in range(max_epochs):
         model.train()
         perm = torch.randperm(len(tr), generator=g).to(dev)
@@ -110,7 +110,7 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
     meta = {"epochs_run": len(history), "best_epoch": int(np.argmin([h[1] for h in history])) + 1,
             "best_holdout_mse": float(best), "device": str(dev),
             "gpu": torch.cuda.get_device_name(0) if dev.type == "cuda" else None,
-            "train_seconds": round(time.time() - t0, 1),
+            "train_seconds": round(time.perf_counter() - t0, 1),
             "loss_history": [[round(a, 7), round(b, 7)] for a, b in history],
             "recon_last": np.concatenate(last).astype(np.float32)}   # reconstructed value at time t
     return np.concatenate(errs).astype(np.float32), meta

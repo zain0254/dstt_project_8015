@@ -1,0 +1,9 @@
+{
+ "total_hours": 0.7897681365628203,
+ "split_train_hours": 0.26116948085855257,
+ "full_train_hours": 0.19842819576587517,
+ "eval_hours": 0.08017045993839259,
+ "budget_hours": 15.0,
+ "seconds_per_unit": 2.1990626861553383e-05,
+ "plan": "full_nab"
+}

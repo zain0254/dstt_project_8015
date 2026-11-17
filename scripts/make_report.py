@@ -76,9 +76,14 @@ def section(name):
                  f"{len(ds['full_clean_files'])} anomaly-free files where every alarm is false. Threshold parameters were chosen "
                  f"leave-one-file-out, so no file is scored with parameters fitted on its own labels. W* = {W} (selected in the split protocol).\n")
     s.append("### Hypothesis decisions\n")
-    s.append("| Hypothesis | Metric | Verdict |\n|---|---|---|")
+    s.append("| Hypothesis | Metric | Verdict (rule in PROTOCOL.md) | P1 − baseline: mean Δ, p (Holm), files where P1 is better |\n|---|---|---|---|")
     for h in hyp["hypotheses"]:
-        s.append(f"| {h['hypothesis']} ({h['role']}) | {h['metric']} | **{h['verdict']}** |")
+        lower = h["metric"] in ("hv_fpr", "fpr")
+        det = "; ".join(f"{SHORT[d['b']]}: {d['mean_diff']:+.3f}, p={d['p_holm']:.3f}, "
+                        f"{d['losses'] if lower else d['wins']}/{d['n_files']}" for d in h.get("detail", []))
+        s.append(f"| {h['hypothesis']} ({h['role']}) | {h['metric']} | **{h['verdict']}** | {det} |")
+    s.append("\nFor FPR metrics a negative Δ favours P1; for all others a positive Δ does. "
+             "The verdict applies the pre-registered rule; the last column shows direction and size.")
     s.append(f"\n![hypotheses]({figdir}/hypothesis_summary.png)\n")
     s.append("### Main comparison\n")
     s.append(table(summ, PRIMARY))
@@ -116,7 +121,8 @@ def section(name):
                      ("walkthrough_signal_score_threshold", "Signal, reconstruction, score and thresholds on one file"),
                      ("loss_curves_examples", "Training vs hold-out loss"), ("heatmap_composite_f1", "Composite F1 per file and method"), ("heatmap_nab_standard", "NAB score per file"),
                      ("heatmap_hv_fpr", "High-variance FPR per file"), ("roc_operating_points", "Each rule's operating point on the model's ROC curve"),
-                     ("error_distributions", "Reconstruction-error distributions, normal vs anomalous"), ("alarm_outcomes", "TP / FP / FN shares"),
+                     ("error_distributions", "Reconstruction-error distributions, normal vs anomalous"),
+                     ("scale_diagnostic", "MAD vs std scale of training errors"), ("alarm_outcomes", "TP / FP / FN shares"),
                      ("radar_profile", "Overall profile"), ("average_rank", "Average rank"), ("delay_and_alerts", "Detection delay and alert counts"),
                      ("clean_stream_false_alarms", "False alarms on anomaly-free streams"), ("sensitivity_lambda_validation", "λ sensitivity"),
                      ("window_size_effect", "Window-size effect"), ("training_curves", "LSTM-AE training curves"), ("model_quality_auc", "Model ROC/PR-AUC per file")]:

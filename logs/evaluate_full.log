@@ -1,0 +1,17 @@
+full-corpus protocol: 58 files, W* = 30; leave-one-file-out tuning ...
+events scored: 107 in 52 files (+6 anomaly-free files)
+H1 primary -> Not supported
+H1 secondary (point F1) -> Not supported
+H2 primary -> Partially supported
+H2 secondary (anomaly-free test streams) -> Not supported
+H3 primary -> Not supported
+                method  composite_f1    f1  event_recall  events_detected   fpr  hv_fpr  corpus_nab_standard
+   A1_median_mad_plain         0.433 0.221         0.815               88 0.098   0.255               30.287
+   A2_median_mad_gated         0.395 0.239         0.807               87 0.166   0.379               22.343
+  A3_mean_ksigma_plain         0.514 0.152         0.752               82 0.015   0.071               47.109
+  A4_mean_ksigma_gated         0.358 0.226         0.705               80 0.100   0.306               32.701
+   B1_fixed_percentile         0.473 0.226         0.717               80 0.078   0.172               38.977
+  B2_fixed_mean_ksigma         0.468 0.222         0.692               79 0.069   0.134               43.528
+B3_rolling_mean_3sigma         0.482 0.207         0.827               91 0.031   0.141               36.555
+  B4_fixed_mean_3sigma         0.458 0.237         0.783               86 0.087   0.200               32.668
+  P1_moving_median_mad         0.433 0.221         0.815               88 0.098   0.255               30.287

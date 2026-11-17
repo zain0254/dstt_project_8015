@@ -1,0 +1,523 @@
+file,method,params,lofo_composite_f1
+artificialNoAnomaly/art_daily_no_noise.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_daily_small_noise.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_flatline.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_noisy.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+artificialWithAnomaly/art_daily_flatmiddle.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4586942925
+artificialWithAnomaly/art_daily_jumpsdown.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4594846558
+artificialWithAnomaly/art_daily_jumpsup.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4591684495
+artificialWithAnomaly/art_daily_nojump.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4616181463
+artificialWithAnomaly/art_increase_spike_density.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4582342423
+artificialWithAnomaly/art_load_balancer_spikes.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4572633552
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4556311504
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4530784146
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4494796702
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4556875888
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4429437225
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4485734597
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4536563432
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4580309335
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4573951591
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4573396809
+realAWSCloudwatch/ec2_network_in_257a54.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4473947151
+realAWSCloudwatch/ec2_network_in_5abac7.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.455365734
+realAWSCloudwatch/elb_request_count_8c0756.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4494796702
+realAWSCloudwatch/grok_asg_anomaly.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.453305212
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4513521931
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4494796702
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 400}",0.4451414228
+realAdExchange/exchange-2_cpc_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4625515656
+realAdExchange/exchange-2_cpm_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4625515656
+realAdExchange/exchange-3_cpc_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.44708097
+realAdExchange/exchange-3_cpm_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4459213867
+realAdExchange/exchange-4_cpc_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4507923118
+realAdExchange/exchange-4_cpm_results.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4537755527
+realKnownCause/ambient_temperature_system_failure.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4527554672
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4614118251
+realKnownCause/ec2_request_latency_system_failure.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4429437225
+realKnownCause/machine_temperature_system_failure.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4577766463
+realKnownCause/nyc_taxi.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4505266968
+realKnownCause/rogue_agent_key_hold.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4600692212
+realKnownCause/rogue_agent_key_updown.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4569314825
+realTraffic/TravelTime_387.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4534908433
+realTraffic/TravelTime_451.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 400}",0.4553884995
+realTraffic/occupancy_6005.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 400}",0.4582350324
+realTraffic/occupancy_t4013.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4434333968
+realTraffic/speed_6005.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4432760588
+realTraffic/speed_7578.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4497822588
+realTraffic/speed_t4013.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4432045326
+realTweets/Twitter_volume_AAPL.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4578960037
+realTweets/Twitter_volume_AMZN.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4557409716
+realTweets/Twitter_volume_CRM.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4493237722
+realTweets/Twitter_volume_CVS.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4559546224
+realTweets/Twitter_volume_FB.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.457398727
+realTweets/Twitter_volume_GOOG.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4527383178
+realTweets/Twitter_volume_IBM.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.454841292
+realTweets/Twitter_volume_KO.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4584090672
+realTweets/Twitter_volume_PFE.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4608563415
+realTweets/Twitter_volume_UPS.csv,A1_median_mad_plain,"{""lam"": 15, ""w"": 200}",0.4593048575
+artificialNoAnomaly/art_daily_no_noise.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+artificialNoAnomaly/art_daily_small_noise.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+artificialNoAnomaly/art_flatline.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+artificialNoAnomaly/art_noisy.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+artificialWithAnomaly/art_daily_flatmiddle.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4275154674
+artificialWithAnomaly/art_daily_jumpsdown.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4297212746
+artificialWithAnomaly/art_daily_jumpsup.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4295010098
+artificialWithAnomaly/art_daily_nojump.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.432312763
+artificialWithAnomaly/art_increase_spike_density.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4294187962
+artificialWithAnomaly/art_load_balancer_spikes.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4283756613
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4268157042
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4250599345
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,A2_median_mad_gated,"{""lam"": 20, ""w"": 200}",0.4267885626
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4280149406
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4168878987
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4234773303
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4253950402
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4306762671
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4291704706
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4291272951
+realAWSCloudwatch/ec2_network_in_257a54.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 400}",0.4198979973
+realAWSCloudwatch/ec2_network_in_5abac7.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4270004208
+realAWSCloudwatch/elb_request_count_8c0756.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.420664224
+realAWSCloudwatch/grok_asg_anomaly.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4269547168
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4234988202
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4258461109
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 400}",0.4253718241
+realAdExchange/exchange-2_cpc_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4337361195
+realAdExchange/exchange-2_cpm_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4337361195
+realAdExchange/exchange-3_cpc_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4183308412
+realAdExchange/exchange-3_cpm_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4177697465
+realAdExchange/exchange-4_cpc_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4245136576
+realAdExchange/exchange-4_cpm_results.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4256393664
+realKnownCause/ambient_temperature_system_failure.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4233358074
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4321809735
+realKnownCause/ec2_request_latency_system_failure.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4141282763
+realKnownCause/machine_temperature_system_failure.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4252629219
+realKnownCause/nyc_taxi.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4213322078
+realKnownCause/rogue_agent_key_hold.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4312624969
+realKnownCause/rogue_agent_key_updown.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4289715968
+realTraffic/TravelTime_387.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4248998382
+realTraffic/TravelTime_451.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4287430183
+realTraffic/occupancy_6005.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 400}",0.4309980575
+realTraffic/occupancy_t4013.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.414696862
+realTraffic/speed_6005.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4147224534
+realTraffic/speed_7578.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.421666444
+realTraffic/speed_t4013.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4146596542
+realTweets/Twitter_volume_AAPL.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4279730299
+realTweets/Twitter_volume_AMZN.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.426375417
+realTweets/Twitter_volume_CRM.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4205363125
+realTweets/Twitter_volume_CVS.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4294378456
+realTweets/Twitter_volume_FB.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4278889655
+realTweets/Twitter_volume_GOOG.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.425744809
+realTweets/Twitter_volume_IBM.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4262365595
+realTweets/Twitter_volume_KO.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4285043271
+realTweets/Twitter_volume_PFE.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.4316910685
+realTweets/Twitter_volume_UPS.csv,A2_median_mad_gated,"{""lam"": 15, ""w"": 200}",0.429736767
+artificialNoAnomaly/art_daily_no_noise.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+artificialNoAnomaly/art_daily_small_noise.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+artificialNoAnomaly/art_flatline.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+artificialNoAnomaly/art_noisy.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+artificialWithAnomaly/art_daily_flatmiddle.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+artificialWithAnomaly/art_daily_jumpsdown.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+artificialWithAnomaly/art_daily_jumpsup.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5048561695
+artificialWithAnomaly/art_daily_nojump.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+artificialWithAnomaly/art_increase_spike_density.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5048561695
+artificialWithAnomaly/art_load_balancer_spikes.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5153083936
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5131229809
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5118399082
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5049110935
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5240468245
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5067926089
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.505449336
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5143781663
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5151797991
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5073101996
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5233542476
+realAWSCloudwatch/ec2_network_in_257a54.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5098825772
+realAWSCloudwatch/ec2_network_in_5abac7.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5068056198
+realAWSCloudwatch/elb_request_count_8c0756.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5068370781
+realAWSCloudwatch/grok_asg_anomaly.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5140208538
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.505419206
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5073290182
+realAdExchange/exchange-2_cpc_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+realAdExchange/exchange-2_cpm_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5124503183
+realAdExchange/exchange-3_cpc_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5053695884
+realAdExchange/exchange-3_cpm_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5048561695
+realAdExchange/exchange-4_cpc_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5107666482
+realAdExchange/exchange-4_cpm_results.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5115044641
+realKnownCause/ambient_temperature_system_failure.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5148434717
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5214563967
+realKnownCause/ec2_request_latency_system_failure.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5048561695
+realKnownCause/machine_temperature_system_failure.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5217131618
+realKnownCause/nyc_taxi.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5158282576
+realKnownCause/rogue_agent_key_hold.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5210063163
+realKnownCause/rogue_agent_key_updown.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.513421701
+realTraffic/TravelTime_387.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5111099085
+realTraffic/TravelTime_451.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5244640127
+realTraffic/occupancy_6005.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5224063995
+realTraffic/occupancy_t4013.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.513748895
+realTraffic/speed_6005.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5116229975
+realTraffic/speed_7578.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5118169867
+realTraffic/speed_t4013.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5113921172
+realTweets/Twitter_volume_AAPL.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5176434114
+realTweets/Twitter_volume_AMZN.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5192464374
+realTweets/Twitter_volume_CRM.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5117837243
+realTweets/Twitter_volume_CVS.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5183226693
+realTweets/Twitter_volume_FB.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5192684284
+realTweets/Twitter_volume_GOOG.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5163210092
+realTweets/Twitter_volume_IBM.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5150728215
+realTweets/Twitter_volume_KO.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5176142891
+realTweets/Twitter_volume_PFE.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5190954559
+realTweets/Twitter_volume_UPS.csv,A3_mean_ksigma_plain,"{""k"": 4, ""w"": 400}",0.5190202719
+artificialNoAnomaly/art_daily_no_noise.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+artificialNoAnomaly/art_daily_small_noise.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+artificialNoAnomaly/art_flatline.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+artificialNoAnomaly/art_noisy.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+artificialWithAnomaly/art_daily_flatmiddle.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+artificialWithAnomaly/art_daily_jumpsdown.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+artificialWithAnomaly/art_daily_jumpsup.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4059221867
+artificialWithAnomaly/art_daily_nojump.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+artificialWithAnomaly/art_increase_spike_density.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+artificialWithAnomaly/art_load_balancer_spikes.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4165549334
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4186096146
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4199892071
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4216976611
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4133072285
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4104724219
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.41734676
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4222187148
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4207218676
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4190543165
+realAWSCloudwatch/ec2_network_in_257a54.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4109045576
+realAWSCloudwatch/ec2_network_in_5abac7.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4181189615
+realAWSCloudwatch/elb_request_count_8c0756.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4075916053
+realAWSCloudwatch/grok_asg_anomaly.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.415836447
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4158222251
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4169838863
+realAdExchange/exchange-2_cpc_results.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+realAdExchange/exchange-2_cpm_results.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+realAdExchange/exchange-3_cpc_results.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4103371145
+realAdExchange/exchange-3_cpm_results.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4136249713
+realAdExchange/exchange-4_cpc_results.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4174296329
+realAdExchange/exchange-4_cpm_results.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4171764755
+realKnownCause/ambient_temperature_system_failure.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4153961677
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4249876124
+realKnownCause/ec2_request_latency_system_failure.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4068355329
+realKnownCause/machine_temperature_system_failure.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4203155352
+realKnownCause/nyc_taxi.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4138780715
+realKnownCause/rogue_agent_key_hold.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4250233672
+realKnownCause/rogue_agent_key_updown.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4204387789
+realTraffic/TravelTime_387.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4168128463
+realTraffic/TravelTime_451.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4234288928
+realTraffic/occupancy_6005.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4255300298
+realTraffic/occupancy_t4013.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4075882126
+realTraffic/speed_6005.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4133675835
+realTraffic/speed_7578.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4127927819
+realTraffic/speed_t4013.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4059221867
+realTweets/Twitter_volume_AAPL.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4196920253
+realTweets/Twitter_volume_AMZN.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4185809173
+realTweets/Twitter_volume_CRM.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.4110444036
+realTweets/Twitter_volume_CVS.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4193787011
+realTweets/Twitter_volume_FB.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4223368306
+realTweets/Twitter_volume_GOOG.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4157035885
+realTweets/Twitter_volume_IBM.csv,A4_mean_ksigma_gated,"{""k"": 4, ""w"": 400}",0.41668439
+realTweets/Twitter_volume_KO.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4200386878
+realTweets/Twitter_volume_PFE.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4217646828
+realTweets/Twitter_volume_UPS.csv,A4_mean_ksigma_gated,"{""k"": 6, ""w"": 200}",0.4212429465
+artificialNoAnomaly/art_daily_no_noise.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+artificialNoAnomaly/art_daily_small_noise.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+artificialNoAnomaly/art_flatline.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+artificialNoAnomaly/art_noisy.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+artificialWithAnomaly/art_daily_flatmiddle.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4871810156
+artificialWithAnomaly/art_daily_jumpsdown.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4862966591
+artificialWithAnomaly/art_daily_jumpsup.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4685597414
+artificialWithAnomaly/art_daily_nojump.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+artificialWithAnomaly/art_increase_spike_density.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4678771701
+artificialWithAnomaly/art_load_balancer_spikes.csv,B1_fixed_percentile,"{""p"": 99.5}",0.471194336
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4813647846
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4782552972
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,B1_fixed_percentile,"{""p"": 99.5}",0.483558791
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4804420115
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781912772
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4755469886
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4781103014
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4792121449
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4829153676
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4791184898
+realAWSCloudwatch/ec2_network_in_257a54.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4682986425
+realAWSCloudwatch/ec2_network_in_5abac7.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4753752484
+realAWSCloudwatch/elb_request_count_8c0756.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4712391205
+realAWSCloudwatch/grok_asg_anomaly.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4847093113
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4782636635
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4839894001
+realAdExchange/exchange-2_cpc_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realAdExchange/exchange-2_cpm_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4864794828
+realAdExchange/exchange-3_cpc_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4720859354
+realAdExchange/exchange-3_cpm_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4680880071
+realAdExchange/exchange-4_cpc_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4816404632
+realAdExchange/exchange-4_cpm_results.csv,B1_fixed_percentile,"{""p"": 99.5}",0.479043601
+realKnownCause/ambient_temperature_system_failure.csv,B1_fixed_percentile,"{""p"": 99.5}",0.476071152
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4708511983
+realKnownCause/ec2_request_latency_system_failure.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4817501942
+realKnownCause/machine_temperature_system_failure.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4733512125
+realKnownCause/nyc_taxi.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4768381999
+realKnownCause/rogue_agent_key_hold.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realKnownCause/rogue_agent_key_updown.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realTraffic/TravelTime_387.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4771440105
+realTraffic/TravelTime_451.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realTraffic/occupancy_6005.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+realTraffic/occupancy_t4013.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4678771701
+realTraffic/speed_6005.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4706782905
+realTraffic/speed_7578.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4753128673
+realTraffic/speed_t4013.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4678771701
+realTweets/Twitter_volume_AAPL.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4767657016
+realTweets/Twitter_volume_AMZN.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4774725058
+realTweets/Twitter_volume_CRM.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4754040965
+realTweets/Twitter_volume_CVS.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4762325271
+realTweets/Twitter_volume_FB.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4678771701
+realTweets/Twitter_volume_GOOG.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4730417489
+realTweets/Twitter_volume_IBM.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4782324434
+realTweets/Twitter_volume_KO.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4678771701
+realTweets/Twitter_volume_PFE.csv,B1_fixed_percentile,"{""p"": 99.9}",0.4860441315
+realTweets/Twitter_volume_UPS.csv,B1_fixed_percentile,"{""p"": 99.5}",0.4874850132
+artificialNoAnomaly/art_daily_no_noise.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+artificialNoAnomaly/art_daily_small_noise.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+artificialNoAnomaly/art_flatline.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+artificialNoAnomaly/art_noisy.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+artificialWithAnomaly/art_daily_flatmiddle.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+artificialWithAnomaly/art_daily_jumpsdown.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+artificialWithAnomaly/art_daily_jumpsup.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4883927047
+artificialWithAnomaly/art_daily_nojump.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+artificialWithAnomaly/art_increase_spike_density.csv,B2_fixed_mean_ksigma,"{""k"": 6}",0.4988996131
+artificialWithAnomaly/art_load_balancer_spikes.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4905230075
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4949286525
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4943891404
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5040469532
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5036432494
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4947763908
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4961729629
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4982313066
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4984410293
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5032329138
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4986877557
+realAWSCloudwatch/ec2_network_in_257a54.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4950177727
+realAWSCloudwatch/ec2_network_in_5abac7.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.493195636
+realAWSCloudwatch/elb_request_count_8c0756.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4883927047
+realAWSCloudwatch/grok_asg_anomaly.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5052248459
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,B2_fixed_mean_ksigma,"{""k"": 6}",0.4988996131
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4985662816
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5045049348
+realAdExchange/exchange-2_cpc_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+realAdExchange/exchange-2_cpm_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+realAdExchange/exchange-3_cpc_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4900294256
+realAdExchange/exchange-3_cpm_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4883927047
+realAdExchange/exchange-4_cpc_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5018540404
+realAdExchange/exchange-4_cpm_results.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5002074567
+realKnownCause/ambient_temperature_system_failure.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.496946783
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4930347903
+realKnownCause/ec2_request_latency_system_failure.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4991857307
+realKnownCause/machine_temperature_system_failure.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4958798964
+realKnownCause/nyc_taxi.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4972746529
+realKnownCause/rogue_agent_key_hold.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+realKnownCause/rogue_agent_key_updown.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5034581904
+realTraffic/TravelTime_387.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5031668519
+realTraffic/TravelTime_451.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+realTraffic/occupancy_6005.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+realTraffic/occupancy_t4013.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4883927047
+realTraffic/speed_6005.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4890154948
+realTraffic/speed_7578.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4965691542
+realTraffic/speed_t4013.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4883927047
+realTweets/Twitter_volume_AAPL.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4967043181
+realTweets/Twitter_volume_AMZN.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4987356633
+realTweets/Twitter_volume_CRM.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4949806007
+realTweets/Twitter_volume_CVS.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4988484197
+realTweets/Twitter_volume_FB.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4901228085
+realTweets/Twitter_volume_GOOG.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.494524367
+realTweets/Twitter_volume_IBM.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5005583906
+realTweets/Twitter_volume_KO.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4947520052
+realTweets/Twitter_volume_PFE.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.4981285991
+realTweets/Twitter_volume_UPS.csv,B2_fixed_mean_ksigma,"{""k"": 4}",0.5080005479
+artificialNoAnomaly/art_daily_no_noise.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+artificialNoAnomaly/art_daily_small_noise.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+artificialNoAnomaly/art_flatline.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+artificialNoAnomaly/art_noisy.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+artificialWithAnomaly/art_daily_flatmiddle.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4890780403
+artificialWithAnomaly/art_daily_jumpsdown.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4898269685
+artificialWithAnomaly/art_daily_jumpsup.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4765709502
+artificialWithAnomaly/art_daily_nojump.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4915145607
+artificialWithAnomaly/art_increase_spike_density.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4719067175
+artificialWithAnomaly/art_load_balancer_spikes.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4795609052
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4853974726
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4834098925
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.472511083
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4885918412
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4747634715
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4743297059
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4820623576
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4814905756
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4769279584
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4831245808
+realAWSCloudwatch/ec2_network_in_257a54.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4783426377
+realAWSCloudwatch/ec2_network_in_5abac7.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4773483846
+realAWSCloudwatch/elb_request_count_8c0756.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.479354472
+realAWSCloudwatch/grok_asg_anomaly.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4822064062
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4865690342
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4742688178
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4766415059
+realAdExchange/exchange-2_cpc_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4915145607
+realAdExchange/exchange-2_cpm_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4815313065
+realAdExchange/exchange-3_cpc_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4729517726
+realAdExchange/exchange-3_cpm_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4722179531
+realAdExchange/exchange-4_cpc_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4782331738
+realAdExchange/exchange-4_cpm_results.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4806108273
+realKnownCause/ambient_temperature_system_failure.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4826978627
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4874892317
+realKnownCause/ec2_request_latency_system_failure.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.472260012
+realKnownCause/machine_temperature_system_failure.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4851474283
+realKnownCause/nyc_taxi.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4831169217
+realKnownCause/rogue_agent_key_hold.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4893246668
+realKnownCause/rogue_agent_key_updown.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4810811118
+realTraffic/TravelTime_387.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.477881906
+realTraffic/TravelTime_451.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4915145607
+realTraffic/occupancy_6005.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4868901654
+realTraffic/occupancy_t4013.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4832576736
+realTraffic/speed_6005.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4824342683
+realTraffic/speed_7578.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4777139144
+realTraffic/speed_t4013.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4804133513
+realTweets/Twitter_volume_AAPL.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4854756315
+realTweets/Twitter_volume_AMZN.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.484906225
+realTweets/Twitter_volume_CRM.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4812648817
+realTweets/Twitter_volume_CVS.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4873868916
+realTweets/Twitter_volume_FB.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4869798635
+realTweets/Twitter_volume_GOOG.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4846120922
+realTweets/Twitter_volume_IBM.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.484433123
+realTweets/Twitter_volume_KO.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4856887521
+realTweets/Twitter_volume_PFE.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4876838404
+realTweets/Twitter_volume_UPS.csv,B3_rolling_mean_3sigma,"{""k"": 3, ""w"": 400}",0.4867926416
+artificialNoAnomaly/art_daily_no_noise.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+artificialNoAnomaly/art_daily_small_noise.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+artificialNoAnomaly/art_flatline.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+artificialNoAnomaly/art_noisy.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+artificialWithAnomaly/art_daily_flatmiddle.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4638854268
+artificialWithAnomaly/art_daily_jumpsdown.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4642141372
+artificialWithAnomaly/art_daily_jumpsup.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4473823294
+artificialWithAnomaly/art_daily_nojump.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+artificialWithAnomaly/art_increase_spike_density.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4469997944
+artificialWithAnomaly/art_load_balancer_spikes.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4503740977
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4594884486
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4572474045
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4624921347
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.462927201
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.456907556
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4548253286
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4576344138
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4607402395
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4620451824
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4577182945
+realAWSCloudwatch/ec2_network_in_257a54.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.456734484
+realAWSCloudwatch/ec2_network_in_5abac7.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.455290999
+realAWSCloudwatch/elb_request_count_8c0756.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4489603587
+realAWSCloudwatch/grok_asg_anomaly.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4638319356
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4559118419
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4572774259
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4631120244
+realAdExchange/exchange-2_cpc_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+realAdExchange/exchange-2_cpm_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+realAdExchange/exchange-3_cpc_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4502801473
+realAdExchange/exchange-3_cpm_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4469997944
+realAdExchange/exchange-4_cpc_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4606372662
+realAdExchange/exchange-4_cpm_results.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4589097347
+realKnownCause/ambient_temperature_system_failure.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4573588763
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4526622938
+realKnownCause/ec2_request_latency_system_failure.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4606107095
+realKnownCause/machine_temperature_system_failure.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4551036424
+realKnownCause/nyc_taxi.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4579471674
+realKnownCause/rogue_agent_key_hold.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+realKnownCause/rogue_agent_key_updown.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4625368051
+realTraffic/TravelTime_387.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4606442696
+realTraffic/TravelTime_451.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+realTraffic/occupancy_6005.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4666076376
+realTraffic/occupancy_t4013.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4469997944
+realTraffic/speed_6005.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4498003239
+realTraffic/speed_7578.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4538557493
+realTraffic/speed_t4013.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4469997944
+realTweets/Twitter_volume_AAPL.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4559321783
+realTweets/Twitter_volume_AMZN.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4574017643
+realTweets/Twitter_volume_CRM.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4553004831
+realTweets/Twitter_volume_CVS.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4580997625
+realTweets/Twitter_volume_FB.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4540098523
+realTweets/Twitter_volume_GOOG.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4532710498
+realTweets/Twitter_volume_IBM.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4605151845
+realTweets/Twitter_volume_KO.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4533024756
+realTweets/Twitter_volume_PFE.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4593728126
+realTweets/Twitter_volume_UPS.csv,B4_fixed_mean_3sigma,"{""k"": 3}",0.4604251137
+artificialNoAnomaly/art_daily_no_noise.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_daily_perfect_square_wave.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_daily_small_noise.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_flatline.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+artificialNoAnomaly/art_noisy.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+artificialWithAnomaly/art_daily_flatmiddle.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4586942925
+artificialWithAnomaly/art_daily_jumpsdown.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4594846558
+artificialWithAnomaly/art_daily_jumpsup.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4591684495
+artificialWithAnomaly/art_daily_nojump.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4616181463
+artificialWithAnomaly/art_increase_spike_density.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4582342423
+artificialWithAnomaly/art_load_balancer_spikes.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4572633552
+realAWSCloudwatch/ec2_cpu_utilization_24ae8d.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4556311504
+realAWSCloudwatch/ec2_cpu_utilization_53ea38.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4530784146
+realAWSCloudwatch/ec2_cpu_utilization_5f5533.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4494796702
+realAWSCloudwatch/ec2_cpu_utilization_77c1ca.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4556875888
+realAWSCloudwatch/ec2_cpu_utilization_825cc2.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4429437225
+realAWSCloudwatch/ec2_cpu_utilization_ac20cd.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4485734597
+realAWSCloudwatch/ec2_cpu_utilization_c6585a.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4536563432
+realAWSCloudwatch/ec2_cpu_utilization_fe7f93.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4580309335
+realAWSCloudwatch/ec2_disk_write_bytes_1ef3de.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4573951591
+realAWSCloudwatch/ec2_disk_write_bytes_c0d644.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4573396809
+realAWSCloudwatch/ec2_network_in_257a54.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4473947151
+realAWSCloudwatch/ec2_network_in_5abac7.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.455365734
+realAWSCloudwatch/elb_request_count_8c0756.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4494796702
+realAWSCloudwatch/grok_asg_anomaly.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.453305212
+realAWSCloudwatch/iio_us-east-1_i-a2eb1cd9_NetworkIn.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4513521931
+realAWSCloudwatch/rds_cpu_utilization_cc0c53.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4494796702
+realAWSCloudwatch/rds_cpu_utilization_e47b3b.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 400}",0.4451414228
+realAdExchange/exchange-2_cpc_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4625515656
+realAdExchange/exchange-2_cpm_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4625515656
+realAdExchange/exchange-3_cpc_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.44708097
+realAdExchange/exchange-3_cpm_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4459213867
+realAdExchange/exchange-4_cpc_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4507923118
+realAdExchange/exchange-4_cpm_results.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4537755527
+realKnownCause/ambient_temperature_system_failure.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4527554672
+realKnownCause/cpu_utilization_asg_misconfiguration.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4614118251
+realKnownCause/ec2_request_latency_system_failure.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4429437225
+realKnownCause/machine_temperature_system_failure.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4577766463
+realKnownCause/nyc_taxi.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4505266968
+realKnownCause/rogue_agent_key_hold.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4600692212
+realKnownCause/rogue_agent_key_updown.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4569314825
+realTraffic/TravelTime_387.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4534908433
+realTraffic/TravelTime_451.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 400}",0.4553884995
+realTraffic/occupancy_6005.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 400}",0.4582350324
+realTraffic/occupancy_t4013.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4434333968
+realTraffic/speed_6005.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4432760588
+realTraffic/speed_7578.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4497822588
+realTraffic/speed_t4013.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4432045326
+realTweets/Twitter_volume_AAPL.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4578960037
+realTweets/Twitter_volume_AMZN.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4557409716
+realTweets/Twitter_volume_CRM.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4493237722
+realTweets/Twitter_volume_CVS.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4559546224
+realTweets/Twitter_volume_FB.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.457398727
+realTweets/Twitter_volume_GOOG.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4527383178
+realTweets/Twitter_volume_IBM.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.454841292
+realTweets/Twitter_volume_KO.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4584090672
+realTweets/Twitter_volume_PFE.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4608563415
+realTweets/Twitter_volume_UPS.csv,P1_moving_median_mad,"{""lam"": 15, ""memory"": ""plain"", ""w"": 200}",0.4593048575

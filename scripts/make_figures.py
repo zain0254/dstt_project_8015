@@ -208,7 +208,7 @@ for ax, m, t in zip(axs, ("composite_f1", "nab_standard", "hv_fpr"), ("Composite
         vals = [dm[(dm.domain == d) & (dm.method == k)][m].mean() for d in doms]
         ax.bar(np.arange(len(doms)) + (j - (NM - 1) / 2) * w, vals, width=w - 0.02, color=COLORS[k], label=SHORT[k])
     nf = pf[pf.method == P].groupby("domain").size()
-    ax.set_xticks(range(len(doms))); ax.set_xticklabels([f"{d}\n(n={nf[d]})" for d in doms], fontsize=8)
+    ax.set_xticks(range(len(doms))); ax.set_xticklabels([f"{d.replace(' ', chr(10))}\n(n={nf[d]})" for d in doms], fontsize=8)
     ax.set_title(t); ax.axhline(0, color=INK2, lw=0.8)
 axs[0].legend(fontsize=8, ncol=2)
 fig.suptitle("RQ4 — results by NAB domain (descriptive; n = files per domain)", fontweight="bold")
@@ -347,37 +347,62 @@ if "loss_history" in mdf:
     axs[0].set_title("LSTM-AE training: hold-out loss (median, IQR)"); axs[0].legend(fontsize=8)
     axs[1].hist(mdf.epochs_run, bins=np.arange(0.5, mdf.epochs_run.max() + 1.5), color="#2a78d6", edgecolor="white")
     axs[1].set_xlabel("epochs until early stopping"); axs[1].set_ylabel("fits")
-    axs[1].set_title(f"Early stopping (patience {cfg['model']['early_stopping_patience']}, max {cfg['model']['max_epochs']})")
+    axs[1].set_title(f"Early stopping (patience {PR['model']['early_stopping_patience']}, max {PR['model']['max_epochs']})")
     if "train_seconds" in mdf:
         for Wv, d in mdf.groupby("W"):
-            axs[2].scatter(d.n_train_windows, d.train_seconds, s=14, color=ramp.get(Wv), label=f"W = {Wv}", alpha=0.8)
+            axs[2].scatter(d.n_train_windows, d.train_seconds.clip(lower=0), s=14, color=ramp.get(Wv), label=f"W = {Wv}", alpha=0.8)
         dev = mdf["gpu"].dropna().iloc[0] if "gpu" in mdf and mdf["gpu"].notna().any() else "CPU"
         axs[2].set_xlabel("training windows"); axs[2].set_ylabel("seconds")
         axs[2].set_title(f"Training time per fit ({dev})"); axs[2].legend(fontsize=8)
     fig.tight_layout(); save(fig, "results/training_curves.png")
 
 # 12. reconstruction-error distributions: normal vs anomaly-window points (test, W*, seed 42)
-rows = []
+rows, spread = [], []
 for f in EVAL:
     s = load_series(f, cfg["nab_dir"], labels, SPLIT)
     err, _ = load_errors(f, W_STAR, SEED_FIG, args.scores)
-    tr_err = err[W_STAR - 1: s.a]
-    z = (err[s.b:] - np.median(tr_err)) / (np.median(np.abs(tr_err - np.median(tr_err))) + 1e-12)
-    rows.append((s.name, z[s.labels[s.b:] == 0], z[s.labels[s.b:] == 1]))
-fig, ax = plt.subplots(figsize=(13, 5.5))
+    tr_err = np.sort(err[W_STAR - 1: s.a])
+    seg = err[s.b:]
+    # percentile of each scored error within the training-error distribution (bounded 0-100)
+    pct = 100 * np.searchsorted(tr_err, seg, side="right") / len(tr_err)
+    rows.append((s.name, pct[s.labels[s.b:] == 0], pct[s.labels[s.b:] == 1]))
+    med = np.median(tr_err)
+    spread.append((s.name, s.domain, np.median(np.abs(tr_err - med)) / (med + 1e-12),
+                   tr_err.std() / (tr_err.mean() + 1e-12)))
+fig, ax = plt.subplots(figsize=(max(13, 0.25 * len(rows) + 2), 5.5))
 for i, (nm, zn, za) in enumerate(rows):
     for zz, off, c in ((zn, -0.18, "#2a78d6"), (za, 0.18, viz.ANOM)):
         if len(zz):
-            v = np.clip(zz, -5, np.percentile(zz, 99.5))
-            bp = ax.boxplot(v, positions=[i + off], widths=0.32, patch_artist=True, showfliers=False,
+            bp = ax.boxplot(zz, positions=[i + off], widths=0.32, patch_artist=True, showfliers=False,
                             medianprops=dict(color=INK))
             bp["boxes"][0].set_facecolor(c); bp["boxes"][0].set_alpha(0.6)
-ax.set_xticks(range(len(rows))); ax.set_xticklabels([r[0] for r in rows], rotation=60, ha="right", fontsize=8)
-ax.set_yscale("symlog", linthresh=5); ax.set_ylabel("error, robust z (train median / MAD)")
-ax.legend(handles=[Patch(color="#2a78d6", alpha=0.6, label="normal test points"),
-                   Patch(color=viz.ANOM, alpha=0.6, label="points inside NAB anomaly windows")], loc="upper left")
-ax.set_title(f"How separable are anomalies? Reconstruction errors on the {SEG} (W*={W_STAR}, seed {SEED_FIG})")
+ax.axhline(99, color=INK2, ls="--", lw=0.8)
+ax.set_xticks(range(len(rows))); ax.set_xticklabels([r[0] for r in rows], rotation=60, ha="right", fontsize=7)
+ax.set_ylim(-2, 102); ax.set_ylabel("percentile of the training-error distribution")
+ax.legend(handles=[Patch(color="#2a78d6", alpha=0.6, label="normal scored points"),
+                   Patch(color=viz.ANOM, alpha=0.6, label="points inside NAB anomaly windows"),
+                   plt.Line2D([], [], color=INK2, ls="--", label="99th training percentile")], loc="lower left", fontsize=8)
+ax.set_title(f"How separable are anomalies? Scored errors as training percentiles ({SEG}, W*={W_STAR}, seed {SEED_FIG})")
 save(fig, "results/error_distributions.png")
+
+# 12b. scale diagnostic: robust (MAD/median) vs classical (std/mean) relative spread of training errors
+sp = pd.DataFrame(spread, columns=["name", "domain", "mad_rel", "std_rel"]).sort_values("mad_rel")
+floor = 1e-3                                   # zero cannot be drawn on a log axis: show it at the floor
+fig, ax = plt.subplots(figsize=(max(13, 0.25 * len(sp) + 2), 4.8))
+x = np.arange(len(sp))
+zero = sp.mad_rel.to_numpy() <= floor
+ax.scatter(x[~zero], sp.mad_rel[~zero], s=30, color=COLORS[P], label="MAD / median (scale used by P1)", zorder=3)
+ax.scatter(x[zero], np.full(zero.sum(), floor), s=60, marker="v", color=COLORS[P], zorder=3,
+           label=f"MAD / median ≤ {floor:g} (MAD collapsed, {zero.sum()} files)")
+ax.scatter(x, sp.std_rel, s=30, color=COLORS["B2_fixed_mean_ksigma"], marker="s", label="std / mean (scale used by B2-B4)", zorder=3)
+ax.axhline(floor, color=INK2, lw=0.6, ls=":")
+ax.set_yscale("log"); ax.set_xticks(x); ax.set_xticklabels(sp.name, rotation=60, ha="right", fontsize=7)
+ax.set_ylabel("relative spread of training errors")
+ax.legend(fontsize=8, loc="upper left")
+ratio = np.median((sp.std_rel / sp.mad_rel.clip(lower=1e-12))[~zero])
+ax.set_title(f"Scale of training reconstruction errors: MAD collapses on {zero.sum()} of {len(sp)} files; "
+             f"elsewhere std-based spread is a median {ratio:.1f}x larger")
+save(fig, "results/scale_diagnostic.png")
 
 # 13. ROC curve of the model + each threshold rule's operating point (small multiples)
 ev = EVAL
