@@ -159,7 +159,7 @@ for name in ("full", "split"):
     blk.append(f"**{PR['label']}** — {nfiles} files, {nev} anomaly windows, W* = {hyp['W_star']}\n")
     blk.append(table(summ, PRIMARY))
     blk.append("\n" + " · ".join(f"{h['hypothesis']}: {h['verdict']}" for h in hyp["hypotheses"] if h["role"] == "primary") + "\n")
-    blk.append(f"![headline]({Path(PR['figures']).relative_to(ROOT)}/headline_metrics.png)\n")
+    blk.append(f"Figures: [`{Path(PR['figures']).relative_to(ROOT)}/`]({Path(PR['figures']).relative_to(ROOT)}/)\n")
 if blk:
     rd = (ROOT / "README.md").read_text()
     a, b = rd.index("<!-- RESULTS_START -->"), rd.index("<!-- RESULTS_END -->")
