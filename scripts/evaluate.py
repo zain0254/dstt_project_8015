@@ -1,32 +1,32 @@
 """Step 2 - tune thresholds on validation, evaluate on test, run statistics.
 
-Reads the saved reconstruction errors (results/scores/*.npz) and writes:
-  results/tuning_candidates.csv   validation objective of every candidate
-  results/tuning_summary.csv      mean over tuning files and seeds
-  results/selected_params.csv     chosen parameters per method and W
-  results/window_selection.csv    validation ROC-AUC per W (chooses W*)
-  results/test_metrics.csv        every test metric, every file/W/seed/method
-  results/per_file_metrics.csv    seed-averaged at W* (unit of analysis)
-  results/summary_by_method.csv   means over evaluation files at W*
-  results/corpus_nab.csv          official-style corpus NAB scores
-  results/comparisons.csv         P1 vs every other method, Wilcoxon + Holm
-  results/hypotheses.json         H1-H3 decisions (rules from PROTOCOL.md)
-  results/traces/*.npz            test thresholds at W* (for figures)
+Split protocol. Reads the saved reconstruction errors (results/split/scores/*.npz) and writes:
+  results/split/tuning_candidates.csv   validation objective of every candidate
+  results/split/tuning_summary.csv      mean over tuning files and seeds
+  results/split/selected_params.csv     chosen parameters per method and W
+  results/split/window_selection.csv    validation ROC-AUC per W (chooses W*)
+  results/split/test_metrics.csv        every test metric, every file/W/seed/method
+  results/split/per_file_metrics.csv    seed-averaged at W* (unit of analysis)
+  results/split/summary_by_method.csv   means over evaluation files at W*
+  results/split/corpus_nab.csv          official-style corpus NAB scores
+  results/split/comparisons.csv         P1 vs every other method, Wilcoxon + Holm
+  results/split/hypotheses.json         H1-H3 decisions (rules from PROTOCOL.md)
+  results/split/traces/*.npz            test thresholds at W* (for figures)
 """
 import argparse, json, os, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import numpy as np
 import pandas as pd
-from atd import ROOT, load_config
+from atd import ROOT, load_config, protocol, load_datasets
 from atd.data import file_id
 from atd.pipeline import tune, test, SCORES_DIR
-from atd.stats import per_file, corpus_nab, comparison_table, decide_hypotheses
+from atd.stats import per_file, corpus_nab, comparison_table, decide_hypotheses, base_paper_block
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scores", default=str(SCORES_DIR))
-    ap.add_argument("--out", default=str(ROOT / "results"))
+    ap.add_argument("--scores", default=str(protocol(load_config(), "split")["scores"]))
+    ap.add_argument("--out", default=str(protocol(load_config(), "split")["results"]))
     ap.add_argument("--workers", type=int, default=max(1, min(8, (os.cpu_count() or 2) - 1)))
     ap.add_argument("--allow-standin", action="store_true", help="pipeline test only")
     args = ap.parse_args()
@@ -35,7 +35,7 @@ def main():
         raise SystemExit(f"score files come from {models}; reported results must come from the LSTM-AE only")
 
     cfg = load_config()
-    datasets = json.loads((ROOT / "configs/datasets.json").read_text())
+    datasets = load_datasets()
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
 
     print("tuning on validation partitions ...", flush=True)
@@ -82,7 +82,8 @@ def main():
     ccomp["metric"] = "clean_" + ccomp["metric"]
     pd.concat([comp, ccomp]).to_csv(out / "comparisons.csv", index=False)
     hyp = decide_hypotheses(pf, corp, cfg, clean=cpf)
-    (out / "hypotheses.json").write_text(json.dumps({"W_star": w_star, "hypotheses": hyp}, indent=1, default=float))
+    (out / "hypotheses.json").write_text(json.dumps({"W_star": w_star, "protocol": "split", "hypotheses": hyp,
+                                                    "base_paper": base_paper_block(pf, cfg)}, indent=1, default=float))
     for h in hyp:
         print(h["hypothesis"], h["role"], "->", h["verdict"])
     print(summ[["method", "composite_f1", "f1", "event_recall", "fpr", "hv_fpr", "clean_fpr", "n_alerts",

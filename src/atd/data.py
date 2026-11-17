@@ -21,6 +21,8 @@ import pandas as pd
 from . import ROOT
 
 DOMAINS = {
+    "artificialNoAnomaly": "Artificial",
+    "artificialWithAnomaly": "Artificial",
     "realAWSCloudwatch": "AWS CloudWatch",
     "realAdExchange": "Ad Exchange",
     "realKnownCause": "Known Cause",
@@ -116,12 +118,10 @@ def load_series(nab_file: str, nab_dir: str | Path = "data/nab", labels: dict | 
     return Series(nab_file, ts, df["value"].to_numpy(dtype=float), lab, wins, a, b, n_missing, n_dup)
 
 
-def select_datasets(labels: dict, nab_dir="data/nab", split=(0.6, 0.2, 0.2)) -> dict:
-    """Label-location rule from PROTOCOL.md (uses no model output)."""
-    ev, tune = [], []
+def select_datasets(labels: dict, nab_dir="data/nab", split=(0.6, 0.2, 0.2), split_b=(0.15, 0.0, 0.85)) -> dict:
+    """Label-location rules from PROTOCOL.md (use no model output)."""
+    ev, tune, full, full_ev, full_clean = [], [], [], [], []
     for f in sorted(labels):
-        if not (f.startswith("real") or f.startswith("artificialWithAnomaly")):
-            continue
         if not (Path(ROOT / nab_dir) / f).exists():
             continue
         s = load_series(f, nab_dir, labels, split)
@@ -129,8 +129,12 @@ def select_datasets(labels: dict, nab_dir="data/nab", split=(0.6, 0.2, 0.2)) -> 
             ev.append(f)
         if s.windows_in(s.a, s.b):
             tune.append(f)
+        sb = load_series(f, nab_dir, labels, split_b)
+        full.append(f)
+        (full_ev if sb.windows_in(sb.a, sb.n) else full_clean).append(f)
     return {"evaluation_files": ev, "tuning_files": tune,
-            "all_files": sorted(set(ev) | set(tune))}
+            "all_files": sorted(set(ev) | set(tune)),
+            "full_corpus_files": full, "full_eval_files": full_ev, "full_clean_files": full_clean}
 
 
 class MinMax:
@@ -156,17 +160,33 @@ def make_windows(x: np.ndarray, W: int) -> np.ndarray:
     return sliding_window_view(x, W).astype(np.float32)
 
 
-def training_windows(x: np.ndarray, W: int, a: int, max_windows: int) -> np.ndarray:
-    """Windows entirely inside the training partition (end index < a).
+def training_windows(x: np.ndarray, W: int, a: int, max_windows: int,
+                     labels: np.ndarray | None = None) -> np.ndarray:
+    """Windows that end inside the training segment (end index < a).
 
-    Labels are NOT used: the autoencoder is trained unsupervised, as in the
-    proposal. If there are more than max_windows, an evenly strided subset is
-    taken (keeps chronological coverage, bounds compute)."""
+    If `labels` is given (normal-only training, PROTOCOL.md §3), windows that
+    contain any point of a labelled anomaly window are dropped. Only labels of
+    the training segment are involved. If more than max_windows remain, an
+    evenly strided subset is taken (keeps chronological coverage)."""
     allw = make_windows(x[:a], W)
+    if labels is not None:
+        bad = np.convolve(labels[:a].astype(int), np.ones(W, int), "valid") > 0
+        if (~bad).sum() >= 32:          # keep everything if too little clean data remains
+            allw = allw[~bad]
     if len(allw) > max_windows:
         idx = np.linspace(0, len(allw) - 1, max_windows).round().astype(int)
         allw = allw[idx]
     return allw
+
+
+def normal_train_errors(errors: np.ndarray, s: "Series", W: int) -> np.ndarray:
+    """Reconstruction errors of training-segment points whose window contains
+    no labelled anomaly (chronological order). Used to calibrate fixed
+    thresholds and to seed rolling thresholds."""
+    e = errors[W - 1: s.a]
+    bad = np.convolve(s.labels[: s.a].astype(int), np.ones(W, int), "valid") > 0
+    clean = e[~bad]
+    return clean if len(clean) >= 32 else e
 
 
 def high_variance_mask(s: Series, x_scaled: np.ndarray, roll: int = 50, pct: float = 75) -> np.ndarray:

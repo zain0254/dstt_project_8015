@@ -1,20 +1,18 @@
-# Running the project on Windows with WSL (Ubuntu) and the RTX 4050
+# Running the experiment (Windows + WSL Ubuntu + RTX 4050)
 
-WSL2 lets Ubuntu use the laptop's NVIDIA GPU directly. You install no CUDA toolkit and no driver inside Ubuntu, only the normal Windows NVIDIA driver.
+Use the **Ubuntu terminal** for the run. VS Code is fine for browsing files and figures afterwards, but a plain terminal keeps the long run independent of the editor.
 
-## 1. One-time Windows setup
+## 0. Requirements
 
-1. Update the **NVIDIA driver** on Windows (GeForce Experience → Drivers, or nvidia.com).
-2. If Ubuntu is not installed yet, open **PowerShell as Administrator** and run `wsl --install -d Ubuntu-24.04`, then restart and create your Ubuntu user.
-3. Open **Ubuntu** and check that the GPU is visible:
-   ```bash
-   nvidia-smi
-   ```
-   It should list *NVIDIA GeForce RTX 4050 Laptop GPU*.
+- Windows 10/11 with WSL2 and Ubuntu 22.04 or 24.04 (`wsl --install -d Ubuntu-24.04` in an admin PowerShell, if not installed).
+- A current **Windows** NVIDIA driver. Do not install a driver or CUDA inside Ubuntu.
+- About 3 GB of free disk space and an internet connection (PyTorch download, NAB check).
 
-## 2. Unpack the project inside Ubuntu
+Check the GPU from Ubuntu: `nvidia-smi` must list the *RTX 4050 Laptop GPU*.
 
-Work in the Linux home folder, not under `/mnt/c`, because it is much faster. Assuming the zip is in your Windows Downloads folder:
+## 1. Unpack and set up (once, about 5–10 minutes)
+
+Work in the Linux home folder, which is much faster than `/mnt/c`:
 
 ```bash
 cd ~
@@ -24,34 +22,65 @@ cd lstm-ae-adaptive-threshold
 bash setup_wsl.sh
 ```
 
-The last lines of the setup must show `CUDA available: True | NVIDIA GeForce RTX 4050 Laptop GPU` and five `ok test_...` lines.
+The setup must end with `CUDA available: True | NVIDIA GeForce RTX 4050 Laptop GPU` and nine `ok test_...` lines.
 
-## 3. Quick check (about 2 minutes)
+## 2. Run everything
 
 ```bash
 source .venv/bin/activate
-python scripts/train_score.py --limit 2
-```
-
-You should see the GPU name and two finished jobs with their training time. Keep these files: the full run continues from them.
-
-## 4. Full run (one command)
-
-```bash
 python run_pipeline.py
 ```
 
-This runs download → dataset selection → EDA → training (369 LSTM-AE fits) → evaluation → figures → dashboard. Keep the laptop plugged in and stop it from sleeping (Windows Settings → Power → Screen and sleep → *Never* while plugged in).
+What happens, in order (logs in `logs/<step>.log`):
 
-- If it stops, resume with `python run_pipeline.py --from train`. Finished models are skipped.
-- Progress: `tail -f logs/train.log` in a second Ubuntu window.
-- Results: open the dashboard from Ubuntu with `explorer.exe dashboard/index.html`. Figures are in `figures/`, all numbers in `results/`.
+| Step | What it does | Rough time on an RTX 4050 |
+|---|---|---|
+| download, select, eda | verifies/downloads the 58 NAB files, applies the selection rules, draws the EDA figures | 2–5 min |
+| **estimate** | trains 6 real models, projects the total runtime, **applies the 15-hour rule** (prints the decision) | 2–5 min |
+| train | split protocol: 369 LSTM-AE fits | about 1–2.5 h |
+| evaluate | validation tuning, test metrics, statistics, selects W\* | 10–20 min |
+| train_full | full corpus: 174 fits at W\* | about 0.5–1 h |
+| evaluate_full | leave-one-file-out selection, metrics, statistics | 10–30 min |
+| figures, dashboards, report | all result figures, `dashboard/index.html`, `docs/RESULTS.md` | 5 min |
 
-## 5. Send the results back
+The times are my estimates. The **estimate** step prints the real projection for your laptop. Keep the laptop plugged in and stop it from sleeping (Windows Settings → Power → *Never* while plugged in).
 
-Zip the outputs and send them, or push them to GitHub:
+**If it stops** (sleep, closed terminal): `python run_pipeline.py --from train`. Finished models are skipped automatically. Use `--from train_full` or `--from evaluate_full` to resume later steps.
+
+**Watch progress** from a second Ubuntu window: `tail -f ~/lstm-ae-adaptive-threshold/logs/train.log`.
+
+**No GPU / CUDA problem:** `python run_pipeline.py --train-args "--device cpu"` (slower; the estimate step will say whether it fits in 15 h).
+
+## 3. Look at the results
 
 ```bash
-zip -r results_run.zip results figures dashboard logs
+explorer.exe dashboard/index.html      # full-corpus dashboard (dashboard/split.html for the proposal split)
+explorer.exe figures                   # all figures (PNG; vector PDFs in figures/full/pdf and figures/split/pdf)
+```
+
+`docs/RESULTS.md` lists every number, hypothesis decision and figure. The README results block is filled in automatically.
+
+## 4. Send the results back
+
+```bash
+zip -r results_run.zip results figures dashboard docs/RESULTS.md README.md logs -x "results/*/scores/*"   # small: no score files
 explorer.exe .
 ```
+
+Upload `results_run.zip` in the chat. Then push the project to GitHub. The zip already contains the git history, which shows that `PROTOCOL.md` was committed before any result existed. Create an **empty** repository on GitHub, then:
+
+```bash
+git add -A && git commit -m "Final experiment run: results, figures, dashboards"
+git remote add origin https://github.com/<you>/<repo>.git
+git push -u origin main
+```
+
+The saved reconstruction errors (`results/*/scores/`, roughly 50–100 MB) are pushed too, so figures and statistics can be regenerated without retraining.
+
+## Optional: code-free submission copy
+
+```bash
+python scripts/export_submission.py ../submission
+```
+
+This copies figures, dashboards, result tables, the protocol and the docs, without code, for an instructor who wants a figures-only repository.

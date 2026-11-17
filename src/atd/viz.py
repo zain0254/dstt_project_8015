@@ -8,6 +8,7 @@ COLORS = {
     "B1_fixed_percentile": "#eb6834",
     "B2_fixed_mean_ksigma": "#1baf7a",
     "B3_rolling_mean_3sigma": "#eda100",
+    "B4_fixed_mean_3sigma": "#52514e",
     "A1_median_mad_plain": "#e87ba4",
     "A2_median_mad_gated": "#008300",
     "A3_mean_ksigma_plain": "#6250d6",
@@ -18,13 +19,15 @@ LABELS = {
     "B1_fixed_percentile": "B1 Fixed percentile",
     "B2_fixed_mean_ksigma": "B2 Fixed mean + k·σ",
     "B3_rolling_mean_3sigma": "B3 Rolling mean + 3σ (base paper)",
+    "B4_fixed_mean_3sigma": "B4 Global mean + 3σ (base paper, untuned)",
     "A1_median_mad_plain": "A1 Median+MAD, plain memory",
     "A2_median_mad_gated": "A2 Median+MAD, gated memory",
     "A3_mean_ksigma_plain": "A3 Rolling mean+kσ, plain memory",
     "A4_mean_ksigma_gated": "A4 Rolling mean+kσ, gated memory",
 }
 SHORT = {k: v.split(" ")[0] for k, v in LABELS.items()}
-PRIMARY = ["B1_fixed_percentile", "B2_fixed_mean_ksigma", "B3_rolling_mean_3sigma", "P1_moving_median_mad"]
+PRIMARY = ["B1_fixed_percentile", "B2_fixed_mean_ksigma", "B3_rolling_mean_3sigma", "B4_fixed_mean_3sigma",
+           "P1_moving_median_mad"]
 ABLATION = ["A1_median_mad_plain", "A2_median_mad_gated", "A3_mean_ksigma_plain", "A4_mean_ksigma_gated"]
 INK, INK2, GRID, ANOM = "#0b0b0b", "#52514e", "#e6e5e0", "#e34948"
 SPLIT_COLORS = {"train": "#f2f1ec", "validation": "#e8f0fb", "test": "#fdf0e9"}
@@ -32,7 +35,7 @@ SPLIT_COLORS = {"train": "#f2f1ec", "validation": "#e8f0fb", "test": "#fdf0e9"}
 
 def setup():
     plt.rcParams.update({
-        "figure.dpi": 110, "savefig.dpi": 150, "savefig.bbox": "tight",
+        "figure.dpi": 110, "savefig.dpi": 200, "savefig.bbox": "tight",
         "font.size": 10, "axes.titlesize": 12, "axes.titleweight": "bold",
         "axes.edgecolor": GRID, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
         "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.6,

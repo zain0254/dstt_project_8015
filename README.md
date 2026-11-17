@@ -2,9 +2,9 @@
 
 **Zain Hassan · MS Data Science · FAST-NUCES Islamabad · Reg. 26I-8015**
 
-An LSTM Autoencoder turns each NAB time series into a stream of reconstruction errors. A *threshold rule* then decides which errors are anomalies. This project asks whether a **moving Median + λ·MAD threshold** (proposed) beats the usual fixed thresholds, in a controlled experiment where the data, split, model and errors are identical and **only the threshold rule changes**.
+An LSTM Autoencoder turns each NAB time series into a stream of reconstruction errors. A *threshold rule* then decides which errors are anomalies. This project tests whether a **moving Median + λ·MAD threshold** (proposed) improves on fixed thresholds and on the base paper's mean + 3σ rule, in a controlled experiment where the data, split, model and errors are identical and **only the threshold rule changes**.
 
-> 📊 **Interactive dashboard:** open [`dashboard/index.html`](dashboard/index.html) in a browser (needs internet for the Plotly library).
+> 📊 **Interactive dashboard:** open [`dashboard/index.html`](dashboard/index.html) in a browser (internet needed for the Plotly library).
 > 📄 **Protocol fixed before training:** [`PROTOCOL.md`](PROTOCOL.md) · **Results write-up:** [`docs/RESULTS.md`](docs/RESULTS.md)
 
 ![pipeline](figures/method/pipeline.png)
@@ -25,65 +25,66 @@ P1 chooses between plain and gated memory on validation data.
 ## Results
 
 <!-- RESULTS_START -->
-*Results appear here after the AWS training run (see `docs/AWS_RUNBOOK.md`).*
+*Results appear here automatically after `python run_pipeline.py` (written by `scripts/make_report.py`).*
 <!-- RESULTS_END -->
 
-## Data
+## Data and protocols
 
-![split](figures/eda/split_overview.png)
+All data comes from the Numenta Anomaly Benchmark v1.1: **58 files, 116 labelled anomaly windows**, downloaded at a pinned commit with sha256 checksums.
 
-- **18 evaluation files** (5 NAB domains): every real NAB file with a labelled anomaly in its test part.
-- **30 tuning files** (25 real + 5 artificial): every file with an anomaly in its validation part. The 23 tuning-only files also provide anomaly-free test streams, which give a direct false-alarm check.
-- Earlier versions used 46 files, and 28 of them had no anomaly in the test part. Those files can't measure detection.
-- Per-file EDA figures are in [`figures/eda/series/`](figures/eda/series/). The summary table is [`results/eda_summary.csv`](results/eda_summary.csv).
+![corpus](figures/eda/corpus_overview.png)
 
-![variability](figures/eda/variability_drift.png)
+| | Full-corpus protocol (**primary**) | Split protocol (proposal) |
+|---|---|---|
+| Files | all 58 | 18 evaluation + 30 tuning |
+| Model trained on | normal windows in the first 15 % | normal windows in the first 60 % |
+| Scored | remaining 85 %: 107 anomaly windows (52 files) + 6 anomaly-free files | last 20 %: 25 anomaly windows (18 files) |
+| Thresholds chosen on | the other 57 files (leave-one-file-out) | validation 20 % of 30 files |
+
+Test labels are never used to choose a threshold. Full details: [`PROTOCOL.md`](PROTOCOL.md). Metric definitions: [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md). What changed from earlier versions and why: [`docs/CHANGES.md`](docs/CHANGES.md).
+
+![preprocessing](figures/eda/preprocessing_example.png)
+
+More EDA: [split overview](figures/eda/split_overview.png) · [variability drift](figures/eda/variability_drift.png) · [anomaly window statistics](figures/eda/anomaly_windows_stats.png) · [autocorrelation](figures/eda/autocorrelation_by_domain.png) · one figure per file in [`figures/eda/series/`](figures/eda/series/).
 
 ## Methods compared
 
 | ID | Threshold rule | Role |
 |---|---|---|
-| B1 | fixed p-th percentile of training errors | baseline (proposal) |
-| B2 | fixed mean + k·σ of training errors | baseline (proposal) |
-| B3 | rolling mean + 3σ of the last w errors | 2026 base paper |
+| B1 | fixed p-th percentile of training errors | fixed baseline (proposal) |
+| B2 | fixed mean + k·σ of training errors | fixed baseline (proposal) |
+| B3 | rolling mean + 3σ of the last w errors | base paper |
+| B4 | global mean + 3σ of training errors | base paper, untuned |
 | **P1** | **moving median + λ·MAD of the last w errors** | **proposed** |
 | A1–A4 | {median/MAD, mean/σ} × {plain, gated memory} | ablation |
 
-All parameters are chosen on **validation data only** (mean composite F1 over the 25 tuning files). Test labels are used only for the final scores.
-
 ## Metrics
 
-| Metric | Meaning |
-|---|---|
-| Point precision / recall / F1, FPR | every time step inside a NAB window is a positive |
-| Event recall | share of anomaly windows with at least one alarm |
-| **Composite F1** | harmonic mean of point precision and event recall (Garg et al., 2021). NAB labels are windows, so each event counts once, and every false alarm still costs. |
-| **NAB score** | official Numenta scoring, verified against `numenta/NAB/nab/sweeper.py` (max difference 4e-15 over 900 random cases). 0 = never alarming, 100 = perfect. Standard, reward-low-FP and reward-low-FN profiles. |
-| High-variance FPR | false alarms on normal points during high local volatility (RQ3 / H2) |
-| Detection delay | how far into the window the first alarm comes |
-| ROC-AUC, PR-AUC | quality of the LSTM-AE score itself; identical for all threshold rules (RQ1) |
+Point precision / recall / F1 / FPR and confusion matrices · event recall and precision · **composite F1** (Garg et al., 2021) · high-variance FPR and anomaly-free-stream FPR (H2) · detection delay · ROC-AUC and PR-AUC of the score (model quality) · **NAB score** computed with Numenta's scoring function (verified against the official code), normalised 0 = never alarming, 100 = perfect. Alarms are reported to the NAB scorer as alert onsets. This is not a NAB leaderboard score; see [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
+
+## Run it (Ubuntu / WSL with an NVIDIA GPU)
+
+```bash
+bash setup_wsl.sh                 # once: Python environment + PyTorch (CUDA) + checks + tests
+source .venv/bin/activate
+python run_pipeline.py            # download -> EDA -> runtime check -> train -> evaluate -> figures -> dashboard -> report
+```
+
+Step-by-step guide: [`docs/RUN_ON_WSL.md`](docs/RUN_ON_WSL.md). Every figure and number is written by the pipeline from the experiment outputs.
 
 ## Repository map
 
 | Path | Content |
 |---|---|
-| `PROTOCOL.md` | every design decision, committed before training |
-| `configs/` | experiment configuration and selected datasets |
-| `src/atd/` | data, LSTM-AE, threshold rules, NAB scorer, metrics, statistics |
-| `scripts/` | `select_datasets` → `train_score` → `evaluate` → `make_figures` / `make_eda` / `make_dashboard` |
-| `results/` | every number: per-file, per-seed, tuning, statistics, hypotheses |
-| `figures/` | all PNG figures (method, EDA, results, per-file threshold traces) |
-| `dashboard/` | interactive HTML dashboard |
-| `aws/`, `docs/AWS_RUNBOOK.md` | how the training was run on AWS EC2 |
+| `PROTOCOL.md` | design and decision rules, fixed before training |
+| `docs/` | methodology (metric formulas), changes, run guide, generated results report |
+| `configs/` | experiment configuration and dataset selection |
+| `src/atd/` | data, LSTM-AE, threshold rules, NAB scorer, metrics, statistics, plot style |
+| `scripts/` | pipeline steps (see `run_pipeline.py --help`) |
+| `results/` | all tables and JSON outputs (`full/`, `split/`) |
+| `figures/` | `eda/`, `method/`, `full/`, `split/` (PNG; `pdf/` for the paper) |
+| `dashboard/` | interactive dashboards (`index.html` = full corpus, `split.html`) |
 | `tests/` | unit tests (`python tests/test_core.py`) |
+| `paper/` | IEEE template for the paper |
 
-## Reproduce
-
-```bash
-pip install -r requirements.txt        # plus PyTorch (CUDA build for a GPU), see docs/RUN_ON_LAPTOP.md
-python run_pipeline.py                 # download -> select -> EDA -> train (369 LSTM-AE fits) -> evaluate -> figures -> dashboard
-```
-
-Every figure in `figures/` and the dashboard are written by these scripts from the experiment outputs. Nothing is drawn by hand. Training runs on a GPU laptop under WSL Ubuntu (`docs/RUN_ON_WSL.md`, `setup_wsl.sh`), natively on Windows (`docs/RUN_ON_LAPTOP.md`), or on AWS EC2 (`docs/AWS_RUNBOOK.md`).
-
-Data: Numenta Anomaly Benchmark v1.1 (Lavin & Ahmad, 2015), included under `data/nab/` with its labels.
+Data: Numenta Anomaly Benchmark (Lavin & Ahmad, 2015), included under `data/nab/` with its labels and license.

@@ -17,7 +17,7 @@ Does a **moving Median + λ·MAD threshold** on LSTM Autoencoder reconstruction 
 
 ![threshold behaviour](figures/method/threshold_behaviour_synthetic.png)
 
-## Results (test partitions of the 18 evaluation files)
+## Results
 
 {{RESULTS}}
 

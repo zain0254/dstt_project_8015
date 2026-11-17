@@ -100,16 +100,19 @@ def train_and_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed:
                 break
     model.load_state_dict(best_state)
     model.eval()
-    errs = []
+    errs, last = [], []
     with torch.no_grad():
         for i in range(0, len(all_windows), 2048):
             xb = torch.from_numpy(np.ascontiguousarray(all_windows[i:i + 2048])).unsqueeze(-1).to(dev)
-            errs.append(((model(xb) - xb) ** 2).mean(dim=(1, 2)).cpu().numpy())
+            rec = model(xb)
+            errs.append(((rec - xb) ** 2).mean(dim=(1, 2)).cpu().numpy())
+            last.append(rec[:, -1, 0].cpu().numpy())
     meta = {"epochs_run": len(history), "best_epoch": int(np.argmin([h[1] for h in history])) + 1,
             "best_holdout_mse": float(best), "device": str(dev),
             "gpu": torch.cuda.get_device_name(0) if dev.type == "cuda" else None,
             "train_seconds": round(time.time() - t0, 1),
-            "loss_history": [[round(a, 7), round(b, 7)] for a, b in history]}
+            "loss_history": [[round(a, 7), round(b, 7)] for a, b in history],
+            "recon_last": np.concatenate(last).astype(np.float32)}   # reconstructed value at time t
     return np.concatenate(errs).astype(np.float32), meta
 
 
@@ -120,4 +123,5 @@ def standin_score(train_windows: np.ndarray, all_windows: np.ndarray, *, seed: i
     k = max(1, min(8, train_windows.shape[1] // 6))
     pca = PCA(n_components=k, random_state=seed).fit(train_windows)
     rec = pca.inverse_transform(pca.transform(all_windows))
-    return ((rec - all_windows) ** 2).mean(axis=1).astype(np.float32), {"model": "pca_standin", "k": k}
+    return ((rec - all_windows) ** 2).mean(axis=1).astype(np.float32), {
+        "model": "pca_standin", "k": k, "recon_last": rec[:, -1].astype(np.float32)}

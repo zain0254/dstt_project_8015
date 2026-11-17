@@ -26,9 +26,9 @@
     "hidden_size": 64,
     "latent_size": 32,
     "learning_rate": 0.001,
-    "batch_size": 256,
-    "max_epochs": 25,
-    "early_stopping_patience": 3,
+    "batch_size": 64,
+    "max_epochs": 40,
+    "early_stopping_patience": 5,
     "early_stopping_holdout": 0.1,
     "max_train_windows": 2500,
     "torch_threads": 4
@@ -70,6 +70,11 @@
         400
       ],
       "memory": "plain"
+    },
+    "B4_fixed_mean_3sigma": {
+      "k": [
+        3
+      ]
     },
     "P1_moving_median_mad": {
       "lam": [
@@ -197,6 +202,7 @@
     "B1_fixed_percentile",
     "B2_fixed_mean_ksigma",
     "B3_rolling_mean_3sigma",
+    "B4_fixed_mean_3sigma",
     "P1_moving_median_mad"
   ],
   "proposed_method": "P1_moving_median_mad",
@@ -205,7 +211,7 @@
     "B2_fixed_mean_ksigma"
   ],
   "tuning_objective": "composite_f1",
-  "window_selection": "W* = window size with the highest mean validation ROC-AUC of the reconstruction-error score over tuning files (threshold-free, identical for all methods)",
+  "window_selection": "W* = window size with the highest mean validation ROC-AUC of the reconstruction error over tuning files (split protocol; threshold-free, identical for all methods). The full-corpus protocol reuses W*.",
   "high_variance": {
     "rolling_window": 50,
     "percentile_of_train": 75
@@ -228,6 +234,26 @@
     }
   },
   "alpha": 0.05,
-  "nab_alerts": "NAB is scored on alert onsets (first step of each alarm segment), identical for all methods; the every-step variant is reported as *_pointwise.",
-  "p1_definition": "P1 = moving Median + lambda x raw MAD of the previous w reconstruction errors (proposal Step 6). lambda, w and the memory type (plain / gated) are hyper-parameters selected on validation partitions only."
+  "nab_alerts": "NAB scoring function (numenta/NAB sweeper) applied to alert onsets: each run of consecutive alarms is reported as one detection at its first step, identically for every method. The every-step variant is reported as *_pointwise.",
+  "p1_definition": "P1 = moving Median + lambda x raw MAD of the previous w reconstruction errors (proposal Step 6). lambda, w and the memory type (plain / gated) are hyper-parameters selected on validation partitions only.",
+  "full_protocol": {
+    "_comment": "PRIMARY protocol: all 58 NAB files, LSTM-AE trained on the first 15% (NAB probationary period), remaining 85% scored, thresholds chosen leave-one-file-out.",
+    "split": {
+      "train": 0.15,
+      "validation": 0.0,
+      "test": 0.85
+    },
+    "model_overrides": {
+      "batch_size": 32,
+      "max_epochs": 60,
+      "early_stopping_patience": 6
+    },
+    "window_size": "W* selected in the split protocol"
+  },
+  "training_data": "normal_only",
+  "_training_data": "Training windows (and the training errors used to calibrate thresholds) exclude any window that overlaps a labelled anomaly window inside the TRAINING segment. Only training-segment labels are used; validation/test labels never are.",
+  "base_paper_methods": [
+    "B3_rolling_mean_3sigma",
+    "B4_fixed_mean_3sigma"
+  ]
 }

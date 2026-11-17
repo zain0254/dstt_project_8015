@@ -39,12 +39,22 @@ def _floor(loc, scale):
     return np.maximum(scale, EPS_ABS + EPS_REL * np.abs(loc))
 
 
+def _seed_window(seed: np.ndarray, w: int) -> np.ndarray:
+    """Last w seed values; a seed shorter than w is repeated to length w."""
+    seed = np.asarray(seed, dtype=float)[-w:]
+    if len(seed) == 0:
+        return np.zeros(w)
+    if len(seed) < w:
+        seed = np.resize(seed, w)
+    return seed
+
+
 def rolling_plain_stats(seed: np.ndarray, stream: np.ndarray, w: int, kind: str):
     """Vectorised rolling (location, scale) with plain memory.
 
     Returns arrays aligned with `stream`: stats for time t use the w values
     immediately before t (taken from seed + stream)."""
-    seed = seed[-w:]
+    seed = _seed_window(seed, w)
     full = np.concatenate([seed, stream])
     win = sliding_window_view(full, w)[: len(stream)]  # row i = w values before stream[i]
     if kind == "median_mad":
@@ -62,9 +72,7 @@ def rolling_gated(seed: np.ndarray, stream: np.ndarray, w: int, mult: float, kin
     """Sequential rolling threshold with anomaly-aware (gated) memory.
 
     Returns (alarms, thresholds) aligned with `stream`."""
-    buf = np.array(seed[-w:], dtype=float)
-    if len(buf) < w:  # pad if the seed is short
-        buf = np.concatenate([np.full(w - len(buf), buf[0] if len(buf) else 0.0), buf])
+    buf = _seed_window(seed, w).copy()
     pos = 0
     n = len(stream)
     thr = np.empty(n)
@@ -123,7 +131,7 @@ def apply_method(method_cfg: dict, method: str, train_err: np.ndarray, stream: n
     if method.startswith("B1"):
         th = fixed_percentile(train_err, params["p"])
         return (stream > th).astype(np.int8), np.full(len(stream), th)
-    if method.startswith("B2"):
+    if method.startswith("B2") or method.startswith("B4"):
         th = fixed_mean_ksigma(train_err, params["k"])
         return (stream > th).astype(np.int8), np.full(len(stream), th)
 

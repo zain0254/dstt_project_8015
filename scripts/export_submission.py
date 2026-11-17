@@ -8,7 +8,6 @@ README (from submission_template/README.md, with the headline results filled in)
 """
 import json, shutil, sys
 from pathlib import Path
-import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 dest = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT.parent / "submission"
@@ -35,38 +34,27 @@ counts = {
 }
 res = dest / "results"; res.mkdir(exist_ok=True)
 n = 0
-for f in (ROOT / "results").glob("*"):
-    if f.suffix in (".csv", ".json") and f.is_file():
-        shutil.copy2(f, res / f.name); n += 1
+for f in (ROOT / "results").rglob("*"):
+    if f.is_file() and f.suffix in (".csv", ".json") and "scores" not in f.parts:
+        t = res / f.relative_to(ROOT / "results"); t.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(f, t); n += 1
 counts["result tables"] = n
+counts["pdf figures"] = copytree(ROOT / "figures", dest / "figures", "*.pdf")
 for f in ("PROTOCOL.md",):
     shutil.copy2(ROOT / f, dest / f)
+for f in ("docs/RESULTS.md", "docs/CHANGES.md", "docs/METHODOLOGY.md"):
+    if (ROOT / f).exists():
+        (dest / "docs").mkdir(exist_ok=True); shutil.copy2(ROOT / f, dest / f)
 if (ROOT / "data/nab/MANIFEST.csv").exists():
     (dest / "data").mkdir(exist_ok=True)
     shutil.copy2(ROOT / "data/nab/MANIFEST.csv", dest / "data" / "NAB_MANIFEST.csv")
-shutil.copy2(ROOT / "configs/experiment.json", dest / "results" / "experiment_config.json")
-shutil.copy2(ROOT / "configs/datasets.json", dest / "results" / "datasets.json")
+shutil.copy2(ROOT / "configs/experiment.json", res / "experiment_config.json")
+shutil.copy2(ROOT / "configs/datasets.json", res / "datasets.json")
 
-# README with the headline table filled in
+# README: reuse the results block that make_report.py wrote into README.md
 tpl = (ROOT / "submission_template/README.md").read_text(encoding="utf-8")
-table = "*Results not available yet.*"
-if (ROOT / "results/summary_by_method.csv").exists():
-    s = pd.read_csv(ROOT / "results/summary_by_method.csv").set_index("method")
-    order = ["B1_fixed_percentile", "B2_fixed_mean_ksigma", "B3_rolling_mean_3sigma", "P1_moving_median_mad"]
-    names = {"B1_fixed_percentile": "B1 Fixed percentile", "B2_fixed_mean_ksigma": "B2 Fixed mean + kσ",
-             "B3_rolling_mean_3sigma": "B3 Rolling mean + 3σ (base paper)", "P1_moving_median_mad": "**P1 Moving median + λ·MAD (proposed)**"}
-    rows = ["| Method | Composite F1 ↑ | Point F1 ↑ | Event recall ↑ | FPR ↓ | High-var. FPR ↓ | NAB standard ↑ | NAB low-FP ↑ |",
-            "|---|---:|---:|---:|---:|---:|---:|---:|"]
-    for k in order:
-        r = s.loc[k]
-        rows.append(f"| {names[k]} | {r.composite_f1:.3f} | {r.f1:.3f} | {r.event_recall:.3f} | {r.fpr:.3f} | "
-                    f"{r.hv_fpr:.3f} | {r.corpus_nab_standard:.1f} | {r.corpus_nab_reward_low_fp:.1f} |")
-    hyp = json.loads((ROOT / "results/hypotheses.json").read_text())
-    rows.append("")
-    rows.append(f"Window size W* = {hyp['W_star']} (chosen on validation). Hypothesis decisions (rules fixed in PROTOCOL.md):")
-    rows.append("")
-    for h in hyp["hypotheses"]:
-        rows.append(f"- **{h['hypothesis']}** ({h['role']}, {h['metric']}): {h['verdict']}")
-    table = "\n".join(rows)
-(dest / "README.md").write_text(tpl.replace("{{RESULTS}}", table), encoding="utf-8")
+rd = (ROOT / "README.md").read_text(encoding="utf-8")
+a, b = rd.find("<!-- RESULTS_START -->"), rd.find("<!-- RESULTS_END -->")
+block = rd[a + len("<!-- RESULTS_START -->"):b].strip() if a >= 0 and b > a else "*Results not available yet.*"
+(dest / "README.md").write_text(tpl.replace("{{RESULTS}}", block), encoding="utf-8")
 print("exported to", dest, counts)

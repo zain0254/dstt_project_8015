@@ -9,22 +9,22 @@ import numpy as np
 import pandas as pd
 
 from . import ROOT, load_config
-from .data import high_variance_mask, load_labels, load_series, scaled_series, file_id
+from .data import high_variance_mask, load_labels, load_series, scaled_series, file_id, normal_train_errors
 from .metrics import evaluate
 from .nab_score import nab_raw
 from .metrics import alert_onsets
 from .thresholds import PlainCache, apply_method, param_grid
 
-SCORES_DIR = ROOT / "results" / "scores"
+SCORES_DIR = ROOT / "results" / "split" / "scores"
 
 
 # ------------------------------------------------------------------ jobs
-def all_jobs(cfg: dict, datasets: dict) -> list[dict]:
+def all_jobs(cfg: dict, datasets: dict, files_key: str = "all_files", windows=None) -> list[dict]:
     labels = load_labels(cfg["labels_file"])
     jobs = []
-    for f in datasets["all_files"]:
+    for f in datasets[files_key]:
         n = len(load_series(f, cfg["nab_dir"], labels).values)
-        for W in cfg["window_sizes"]:
+        for W in (windows or cfg["window_sizes"]):
             for seed in cfg["seeds"]:
                 jobs.append({"file": f, "W": W, "seed": seed, "cost": n * W})
     return jobs
@@ -57,7 +57,7 @@ class Ctx:
     def __init__(self, s, errors, W, hv):
         self.s, self.W = s, W
         self.err = errors
-        self.train_err = errors[W - 1: s.a]
+        self.train_err = normal_train_errors(errors, s, W)
         self.stream = errors[s.a:]            # validation + test, contiguous
         self.val_len = s.b - s.a
         self.hv = hv
@@ -128,10 +128,11 @@ def tune(cfg_path="configs/experiment.json", datasets=None, scores_dir=SCORES_DI
 
 # ----------------------------------------------------------------- test
 def _test_one(args):
-    f, W, seed, cfg_path, scores_dir, selected, subset = args
+    f, W, seed, cfg_path, scores_dir, selected, subset = args[:7]
+    split = args[7] if len(args) > 7 else (0.6, 0.2, 0.2)
     cfg = load_config(cfg_path)
     labels = load_labels(cfg["labels_file"])
-    s = load_series(f, cfg["nab_dir"], labels)
+    s = load_series(f, cfg["nab_dir"], labels, split)
     err, meta = load_errors(f, W, seed, scores_dir)
     x = scaled_series(s)
     hv = high_variance_mask(s, x, cfg["high_variance"]["rolling_window"],
@@ -172,3 +173,82 @@ def test(selected_df: pd.DataFrame, cfg_path="configs/experiment.json", datasets
             if keep_traces_for_W is not None and W == keep_traces_for_W and f in datasets["evaluation_files"]:
                 traces[(f, sd)] = tr
     return pd.DataFrame(rows), traces
+
+
+# ====================================================== full-corpus protocol (primary)
+def _full_candidates(args):
+    """Objective of every candidate on the scored part of one (file, seed)."""
+    f, W, seed, cfg_path, scores_dir, split = args
+    cfg = load_config(cfg_path)
+    labels = load_labels(cfg["labels_file"])
+    s = load_series(f, cfg["nab_dir"], labels, split)
+    err, _ = load_errors(f, W, seed, scores_dir)
+    train_err, stream = normal_train_errors(err, s, W), err[s.a:]
+    lab = s.labels[s.a:]
+    win = [(x - s.a, y - s.a) for x, y in s.windows_in(s.a, s.n)]
+    nabw = cfg["nab_profiles"]["standard"]
+    cache, memo, rows = PlainCache(train_err, stream), {}, []
+    mcfg = cfg["thresholds"]
+    for m in mcfg:
+        for prm in param_grid(mcfg, m):
+            al, _ = apply_method(mcfg, m, train_err, stream, prm, cache, memo)
+            nr = nab_raw(alert_onsets(al), win, nabw["tp"], nabw["fp"], nabw["fn"])
+            cf1 = _quick_objective(al, lab, win, nabw)[0] if win else np.nan
+            rows.append({"file": f, "seed": seed, "method": m, "params": json.dumps(prm, sort_keys=True),
+                         "composite_f1": cf1, "nab_raw": nr["raw"], "nab_null": nr["null"],
+                         "nab_perfect": nr["perfect"], "alarm_rate": float(al.mean())})
+    return rows
+
+
+def lofo_select(cand: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Leave-one-file-out selection.
+
+    For every file, each method's parameters are those with the highest mean
+    composite F1 over all OTHER files (ties: higher corpus NAB score of the
+    other files, then lower alarm rate). A file's own labels never influence
+    the parameters it is scored with."""
+    g = cand.groupby(["method", "params", "file"], as_index=False)[
+        ["composite_f1", "nab_raw", "nab_null", "nab_perfect", "alarm_rate"]].mean()
+    files = sorted(g.file.unique())
+    chosen, pooled = [], []
+    for m, gm in g.groupby("method"):
+        P = {c: gm.pivot(index="params", columns="file", values=c).reindex(columns=files)
+             for c in ["composite_f1", "nab_raw", "nab_null", "nab_perfect", "alarm_rate"]}
+        cf = P["composite_f1"]
+        tot_all = pd.DataFrame({"val_composite_f1": cf.mean(axis=1, skipna=True),
+                                "val_nab_standard": 100 * (P["nab_raw"].sum(axis=1) - P["nab_null"].sum(axis=1)) /
+                                (P["nab_perfect"].sum(axis=1) - P["nab_null"].sum(axis=1)),
+                                "val_alarm_rate": P["alarm_rate"].mean(axis=1)})
+        pooled.append(tot_all.reset_index().assign(method=m))
+        for f in files:
+            others = [x for x in files if x != f]
+            obj = cf[others].mean(axis=1, skipna=True)
+            nab = (100 * (P["nab_raw"][others].sum(axis=1) - P["nab_null"][others].sum(axis=1)) /
+                   (P["nab_perfect"][others].sum(axis=1) - P["nab_null"][others].sum(axis=1)))
+            rate = P["alarm_rate"][others].mean(axis=1)
+            t = pd.DataFrame({"obj": obj.round(10), "nab": nab.round(8), "rate": rate}).reset_index()
+            best = t.sort_values(["obj", "nab", "rate", "params"], ascending=[False, False, True, True]).iloc[0]
+            chosen.append({"file": f, "method": m, "params": best.params, "lofo_composite_f1": best.obj})
+    return pd.DataFrame(chosen), pd.concat(pooled, ignore_index=True)
+
+
+def evaluate_full(W: int, split, scores_dir, cfg_path="configs/experiment.json", datasets=None, workers=2):
+    cfg = load_config(cfg_path)
+    files = datasets["full_corpus_files"]
+    args = [(f, W, sd, cfg_path, str(scores_dir), split) for f in files for sd in cfg["seeds"]]
+    rows = []
+    with ProcessPoolExecutor(workers) as ex:
+        for r in ex.map(_full_candidates, args, chunksize=1):
+            rows += r
+    cand = pd.DataFrame(rows)
+    chosen, pooled = lofo_select(cand)
+    sel = {f: {r.method: json.loads(r.params) for r in d.itertuples()} for f, d in chosen.groupby("file")}
+    targs = [(f, W, sd, cfg_path, str(scores_dir), sel[f],
+              "evaluation" if f in datasets["full_eval_files"] else "clean", split)
+             for f in files for sd in cfg["seeds"]]
+    out, traces = [], {}
+    with ProcessPoolExecutor(workers) as ex:
+        for r, (f, _, sd, tr) in ex.map(_test_one, targs, chunksize=1):
+            out += r
+            traces[(f, sd)] = tr
+    return cand, chosen, pooled, pd.DataFrame(out), traces

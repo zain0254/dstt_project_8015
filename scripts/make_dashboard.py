@@ -7,21 +7,30 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import numpy as np
 import pandas as pd
-from atd import ROOT, load_config
+from atd import ROOT, load_config, load_datasets
 from atd.data import load_labels, load_series, file_id
 from atd.pipeline import load_errors
 from atd.viz import COLORS, LABELS, SHORT, PRIMARY, ABLATION
 
+from atd import protocol
 ap = argparse.ArgumentParser()
-ap.add_argument("--results", default=str(ROOT / "results"))
-ap.add_argument("--scores", default=str(ROOT / "results/scores"))
-ap.add_argument("--out", default=str(ROOT / "dashboard/index.html"))
-ap.add_argument("--title", default="Robust Adaptive Thresholding for LSTM-AE Anomaly Detection — Results")
+ap.add_argument("--protocol", choices=["full", "split"], default="full")
+ap.add_argument("--results", default=None)
+ap.add_argument("--scores", default=None)
+ap.add_argument("--out", default=None)
+ap.add_argument("--title", default=None)
 args = ap.parse_args()
-R = Path(args.results)
 cfg = load_config()
+PR = protocol(cfg, args.protocol)
+args.results = args.results or str(PR["results"])
+args.scores = args.scores or str(PR["scores"])
+args.out = args.out or str(PR["dashboard"])
+args.title = args.title or f"Robust Adaptive Thresholding for LSTM-AE Anomaly Detection — {PR['label']}"
+R = Path(args.results)
 labels = load_labels(cfg["labels_file"])
-ds = json.loads((ROOT / "configs/datasets.json").read_text())
+ds = load_datasets()
+EVAL = ds[PR["eval_key"]]
+SEED_FIG = cfg["seeds"][1]
 hyp = json.loads((R / "hypotheses.json").read_text())
 W = hyp["W_star"]
 summ = pd.read_csv(R / "summary_by_method.csv")
@@ -56,8 +65,8 @@ def bucket(arr, n_out, how):
 
 
 files = {}
-for f in ds["evaluation_files"]:
-    s = load_series(f, cfg["nab_dir"], labels)
+for f in EVAL:
+    s = load_series(f, cfg["nab_dir"], labels, PR["split"])
     N = 1400
     idx = np.linspace(0, s.n - 1, min(N, s.n)).astype(int)
     rec = {"name": s.name, "domain": s.domain, "n": s.n,
@@ -65,10 +74,10 @@ for f in ds["evaluation_files"]:
                       "v": [round(float(x), 4) for x in bucket(s.values, len(idx), "mean")]},
            "a": str(s.timestamps[s.a])[:16], "b": str(s.timestamps[s.b])[:16],
            "windows": [[str(s.timestamps[x])[:16], str(s.timestamps[y])[:16]] for x, y in s.windows]}
-    trp = R / "traces" / f"{file_id(f)}__s42.npz"
+    trp = R / "traces" / f"{file_id(f)}__s{SEED_FIG}.npz"
     if trp.exists():
         tr = np.load(trp)
-        err, _ = load_errors(f, W, 42, args.scores)
+        err, _ = load_errors(f, W, SEED_FIG, args.scores)
         e = err[s.b:]
         m = min(1500, len(e))
         edges = np.linspace(0, len(e), m + 1).astype(int)
@@ -91,7 +100,10 @@ data = {
     "eda": records(eda[[c for c in ["name", "domain", "n", "start", "end", "median_step_min", "missing_filled",
                                     "duplicates_removed", "mean", "std", "min", "max", "skew", "windows_total",
                                     "windows_train", "windows_val", "windows_test", "evaluation", "tuning"] if c in eda]]),
-    "files": files, "n_eval": len(ds["evaluation_files"]), "n_tune": len(ds["tuning_files"]),
+    "files": files, "n_eval": len(EVAL), "n_tune": len(ds["tuning_files"]), "protocol": args.protocol,
+    "protocol_label": PR["label"], "segment": PR["segment"],
+    "n_events": int(sum(len(load_series(f, cfg["nab_dir"], labels, PR["split"]).windows_in(
+        load_series(f, cfg["nab_dir"], labels, PR["split"]).a, 10**9)) for f in EVAL)),
 }
 tpl = (ROOT / "scripts/dashboard_template.html").read_text()
 html = tpl.replace("__TITLE__", args.title).replace("__DATA__", json.dumps(data, separators=(",", ":"), default=str))

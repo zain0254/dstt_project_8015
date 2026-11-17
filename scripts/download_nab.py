@@ -1,7 +1,6 @@
 """Step 1 - data acquisition: download NAB v1.1 from Numenta's GitHub.
 
-Downloads labels/combined_windows.json and every labelled real* and
-artificialWithAnomaly CSV, pinned to a fixed commit for reproducibility,
+Downloads labels/combined_windows.json and all 58 NAB CSV files, pinned to a fixed commit for reproducibility,
 and writes data/nab/MANIFEST.csv with row counts and SHA-256 checksums.
 Already-downloaded files are verified and skipped.
 """
@@ -42,29 +41,31 @@ def git_fallback() -> Path:
     return cache
 
 
-def fetch_any(rel, dest, use_git):
-    if use_git:
-        src = git_fallback() / rel
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        if not dest.exists():
-            dest.write_bytes(src.read_bytes())
-        return dest.read_bytes()
-    return fetch(rel, dest)
+_STATE = {"git": False}
+
+
+def fetch_any(rel, dest):
+    """Raw HTTP first; if that is blocked, switch to git for the rest."""
+    if not _STATE["git"]:
+        try:
+            return fetch(rel, dest, retries=2)
+        except RuntimeError:
+            print("raw download unavailable -> fetching the pinned commit with git", flush=True)
+            _STATE["git"] = True
+    src = git_fallback() / rel
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if not dest.exists():
+        dest.write_bytes(src.read_bytes())
+    return dest.read_bytes()
 
 
 def main():
-    try:
-        fetch("labels/combined_windows.json", OUT / "labels" / "combined_windows.json", retries=2)
-        use_git = False
-    except RuntimeError:
-        print("raw download unavailable -> fetching the pinned commit with git", flush=True)
-        use_git = True
-    labels_raw = fetch_any("labels/combined_windows.json", OUT / "labels" / "combined_windows.json", use_git)
+    labels_raw = fetch_any("labels/combined_windows.json", OUT / "labels" / "combined_windows.json")
     labels = json.loads(labels_raw)
-    files = sorted(f for f in labels if f.startswith("real") or f.startswith("artificialWithAnomaly"))
+    files = sorted(labels)   # the complete corpus: 58 files
     rows = []
     for i, f in enumerate(files, 1):
-        data = fetch_any(f"data/{f}", OUT / f, use_git)
+        data = fetch_any(f"data/{f}", OUT / f)
         rows.append({"file": f, "rows": data.count(b"\n") - 1, "anomaly_windows": len(labels[f]),
                      "sha256": hashlib.sha256(data).hexdigest()})
         print(f"[{i}/{len(files)}] {f}", flush=True)

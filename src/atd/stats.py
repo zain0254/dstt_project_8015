@@ -139,3 +139,16 @@ def decide_hypotheses(pf, corpus, cfg, clean=None) -> list[dict]:
     out.append({"hypothesis": "H3", "role": "primary", "metric": "corpus nab_standard", "verdict": verdict,
                 "corpus_diffs": diffs, "detail": [{**r, "p_holm": h} for r, h in zip(fam, adj)]})
     return out
+
+
+def base_paper_block(pf, cfg) -> list[dict]:
+    """P1 versus the base-paper rules (rolling and global mean + 3 sigma).
+    Descriptive family, Holm-adjusted within each metric; not a proposal hypothesis."""
+    P = cfg["proposed_method"]
+    out = []
+    for metric in ("composite_f1", "f1", "precision", "event_recall", "fpr", "hv_fpr", "nab_standard"):
+        fam = [paired(pf, metric, P, b) for b in cfg["base_paper_methods"]]
+        adj = holm([r["p_value"] for r in fam])
+        for r, h in zip(fam, adj):
+            out.append({**r, "p_holm": h})
+    return out

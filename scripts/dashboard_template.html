@@ -54,7 +54,7 @@
   <section class="tab" id="explorer">
     <div class="row"><label>File <select id="fileSel"></select></label><span class="note" id="fileInfo"></span></div>
     <div class="card"><h3>Raw series, split and NAB anomaly windows</h3><div id="seriesPlot" class="plot"></div></div>
-    <div class="card" style="margin-top:16px"><h3>Test partition: reconstruction error vs each threshold rule</h3>
+    <div class="card" style="margin-top:16px"><h3>Scored segment: reconstruction error vs each threshold rule</h3>
       <p class="note">Toggle methods in the legend. Ticks below show where each rule raises alarms. Red bands = labelled anomaly windows.</p>
       <div id="tracePlot" class="plot" style="min-height:520px"></div></div>
     <div class="card" style="margin-top:16px"><h3>Metrics for this file (seed-averaged)</h3><div class="scroll" id="fileTable"></div></div>
@@ -88,12 +88,12 @@
   <section class="tab" id="method">
     <div class="grid g2">
       <div class="card"><h3>What changes between methods</h3>
-        <p>All methods use the same NAB files, the same chronological 60/20/20 split, the same LSTM Autoencoder and the same reconstruction errors <code>e(t)</code>. Only the rule that converts <code>e(t)</code> into an alarm changes.</p>
-        <p><b>B1</b> threshold = p-th percentile of training errors. <b>B2</b> = mean + k·σ of training errors. <b>B3</b> = mean + 3σ of the previous w errors (2026 base paper).</p>
-        <p><b>P1 (proposed)</b> threshold(t) = median(e<sub>t−w…t−1</sub>) + λ · MAD(e<sub>t−w…t−1</sub>). Its memory can be <i>plain</i> (every error enters the window) or <i>gated</i> (an error that triggered an alarm is not added to the window, so an anomaly cannot raise the bar it is judged by; alarms lasting longer than w steps are accepted as a new normal). λ, w and the memory type are chosen on validation data only.</p></div>
+        <p>All methods use the same NAB files, the same split, the same LSTM Autoencoder (trained on normal training windows) and the same reconstruction errors <code>e(t)</code>. Only the rule that converts <code>e(t)</code> into an alarm changes. Full-corpus protocol: model trained on the first 15 % of each of the 58 files, the other 85 % scored, parameters chosen leave-one-file-out. Split protocol: 60/20/20, parameters chosen on validation.</p>
+        <p><b>B1</b> threshold = p-th percentile of training errors. <b>B2</b> = mean + k·σ of training errors. <b>B3</b> = mean + 3σ of the previous w errors and <b>B4</b> = mean + 3σ of training errors (the two readings of the 2026 base paper's rule, k fixed at 3).</p>
+        <p><b>P1 (proposed)</b> threshold(t) = median(e<sub>t−w…t−1</sub>) + λ · MAD(e<sub>t−w…t−1</sub>). Its memory can be <i>plain</i> (every error enters the window) or <i>gated</i> (an error that triggered an alarm is not added to the window, so an anomaly cannot raise the bar it is judged by; alarms lasting longer than w steps are accepted as a new normal). λ, w and the memory type are chosen without test labels.</p></div>
       <div class="card"><h3>How the metrics work</h3>
         <p><b>Point F1</b>: every time step in a NAB window is a positive. <b>Event recall</b>: share of windows with at least one alarm. <b>Composite F1</b> = harmonic mean of point precision and event recall (Garg et al., 2021) — counts each event once but still punishes every false alarm.</p>
-        <p><b>NAB score</b>: official Numenta scoring (verified against <code>sweeper.py</code>): early detection inside a window earns up to +1, a missed window costs −1, each false alert costs up to −0.11. Normalised so 0 = never alarming and 100 = perfect. Alarms are counted as alerts at their onset.</p>
+        <p><b>NAB score</b>: official Numenta scoring (verified against <code>sweeper.py</code>): early detection inside a window earns up to +1, a missed window costs −1, each false alert costs up to −0.11. Normalised so 0 = never alarming and 100 = perfect. Alarms are reported to the scorer as alert onsets. This is the NAB scoring function, not a NAB leaderboard score.</p>
         <p><b>High-variance FPR</b>: false-positive rate on normal test points whose rolling std is above the 75th percentile seen in training — the "changing normal variability" of RQ3/H2.</p>
         <p><b>ROC-AUC / PR-AUC</b> measure the LSTM-AE score itself and are identical for all threshold rules (RQ1).</p></div>
     </div>
@@ -117,7 +117,7 @@ const METRICS = {composite_f1:'Composite F1 ↑', f1:'Point F1 ↑', precision:'
 const CORPUS = {clean_fpr:'FPR on anomaly-free test streams ↓', clean_alerts_per_1000:'False alerts per 1,000 points, anomaly-free streams ↓', corpus_nab_standard:'Corpus NAB standard ↑', corpus_nab_reward_low_fp:'Corpus NAB reward-low-FP ↑', corpus_nab_reward_low_fn:'Corpus NAB reward-low-FN ↑', corpus_nab_standard_pointwise:'Corpus NAB, every-step alarms ↑'};
 
 document.getElementById('title').textContent = D.title;
-document.getElementById('subtitle').textContent = `${D.n_eval} NAB evaluation files · ${D.n_tune} tuning files · LSTM-AE window W* = ${D.W} · 3 seeds · thresholds tuned on validation, scored on test`;
+document.getElementById('subtitle').textContent = D.protocol === 'full' ? `${D.protocol_label} · ${D.n_eval} files with anomalies (${D.n_events} anomaly windows) · W* = ${D.W} · 3 seeds · thresholds chosen leave-one-file-out` : `${D.protocol_label} · ${D.n_eval} evaluation files (${D.n_events} test anomaly windows) · ${D.n_tune} tuning files · W* = ${D.W} · 3 seeds · thresholds tuned on validation, scored on test`;
 
 // tabs (hash routing)
 const TABS = [['overview','Overview'],['explorer','File explorer'],['compare','Comparisons'],['domains','Domains (RQ4)'],['ablation','Ablation & sensitivity'],['data','Data (EDA)'],['method','Method & metrics']];
